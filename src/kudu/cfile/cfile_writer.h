@@ -186,6 +186,8 @@ class CFileWriter {
 
   Status WriteRawData(const Slice& data);
 
+  Status WriteRawDataV(const vector<Slice> &data);
+
   Status FinishCurDataBlock();
 
   // Flush the current unflushed_metadata_ entries into the given protobuf
