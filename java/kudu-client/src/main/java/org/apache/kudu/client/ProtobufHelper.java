@@ -17,15 +17,18 @@
 
 package org.apache.kudu.client;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.net.HostAndPort;
+import com.google.protobuf.ByteOutput;
 import com.google.protobuf.ByteString;
-import com.google.protobuf.ZeroCopyLiteralByteString;
+import com.google.protobuf.UnsafeByteOperations;
 
 import org.apache.kudu.ColumnSchema;
 import org.apache.kudu.Common;
@@ -77,7 +80,7 @@ public class ProtobufHelper {
       schemaBuilder.setCompression(column.getCompressionAlgorithm().getInternalPbType());
     }
     if (column.getDefaultValue() != null) {
-      schemaBuilder.setReadDefaultValue(ZeroCopyLiteralByteString.wrap(
+      schemaBuilder.setReadDefaultValue(UnsafeByteOperations.unsafeWrap(
           objectToWireFormat(column, column.getDefaultValue())));
     }
     return schemaBuilder.build();
@@ -210,7 +213,15 @@ public class ProtobufHelper {
   }
 
   private static Object byteStringToObject(Type type, ByteString value) {
-    byte[] buf = ZeroCopyLiteralByteString.zeroCopyGetBytes(value);
+    byte[] buf;
+    try {
+      // Workaround to allow extracting the byte array from a ByteString without copy
+      ZeroCopyByteOutput byteOutput = new ZeroCopyByteOutput();
+      UnsafeByteOperations.unsafeWriteTo(value, byteOutput);
+      buf = byteOutput.bytes;
+    } catch (IOException ex){
+      throw new IllegalArgumentException(ex);
+    }
     switch (type) {
       case BOOL:
         return Bytes.getBoolean(buf);
@@ -272,7 +283,7 @@ public class ProtobufHelper {
           "column " + colName + " is of class " + value.getClass().getName() +
           " which does not map to a supported Kudu type");
     }
-    return ZeroCopyLiteralByteString.wrap(bytes);
+    return UnsafeByteOperations.unsafeWrap(bytes);
   }
 
   /**
@@ -298,5 +309,41 @@ public class ProtobufHelper {
    */
   public static HostAndPort hostAndPortFromPB(Common.HostPortPB hostPortPB) {
     return HostAndPort.fromParts(hostPortPB.getHost(), hostPortPB.getPort());
+  }
+
+  /**
+   * Workaround to allow extracting the byte array from a ByteString
+   * without copy using UnsafeByteOperations.unsafeWriteTo
+   */
+  private static final class ZeroCopyByteOutput extends ByteOutput {
+    private byte[] bytes;
+
+    @Override
+    public void writeLazy(byte[] value, int offset, int length) {
+      if (offset != 0) {
+        throw new UnsupportedOperationException();
+      }
+      bytes = value;
+    }
+
+    @Override
+    public void write(byte value) throws IOException {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void write(byte[] value, int offset, int length) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void write(ByteBuffer value) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void writeLazy(ByteBuffer value) {
+      throw new UnsupportedOperationException();
+    }
   }
 }
