@@ -25,6 +25,7 @@ namespace kudu {
 
 using std::string;
 
+#ifdef KUDU_INT128_SUPPORTED
 // Workaround for an ASAN build issue documented here:
 // https://bugs.llvm.org/show_bug.cgi?id=16404
 __attribute__((no_sanitize("undefined")))
@@ -79,5 +80,6 @@ string DecimalToString(int128_t d, int8_t scale) {
   }
   return string(p, local + sizeof(local));
 }
+#endif
 
 } // namespace kudu

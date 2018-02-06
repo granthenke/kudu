@@ -23,6 +23,11 @@
 #include "kudu/util/int128.h"
 
 namespace kudu {
+  // Minimum scale for any Decimal.
+  static const int8_t kMinDecimalScale = 0;
+  static const int8_t kDefaultDecimalScale = 0;
+  // The maximum scale is the Decimal's precision.
+
   // Maximum precision and absolute value of a Decimal that can be stored
   // in 4 bytes.
   static const int8_t kMaxDecimal32Precision = 9;
@@ -38,28 +43,26 @@ namespace kudu {
   // Maximum precision and absolute value of a valid Decimal can be
   // stored in 16 bytes.
   static const int8_t kMaxDecimal128Precision = 38;
+  // Minimum and maximum precision for any Decimal.
+  static const int8_t kMinDecimalPrecision = 1;
+  static const int8_t kMaxDecimalPrecision = kMaxDecimal128Precision;
+
+#ifdef KUDU_INT128_SUPPORTED
   // Hacky calculation because int128 literals are not supported.
   static const int128_t kMaxUnscaledDecimal128 =
       (((static_cast<int128_t>(999999999999999999) * 1000000000000000000) +
           999999999999999999) * 100) + 99; // 38 9's
   static const int128_t kMinUnscaledDecimal128 = -kMaxUnscaledDecimal128;
 
-  // Minimum and maximum precision for any Decimal.
-  static const int8_t kMinDecimalPrecision = 1;
-  static const int8_t kMaxDecimalPrecision = kMaxDecimal128Precision;
   // Maximum absolute value for any Decimal.
   static const int128_t kMaxUnscaledDecimal = kMaxUnscaledDecimal128;
   static const int128_t kMinUnscaledDecimal = kMinUnscaledDecimal128;
-
-  // Minimum scale for any Decimal.
-  static const int8_t kMinDecimalScale = 0;
-  static const int8_t kDefaultDecimalScale = 0;
-  // The maximum scale is the Decimal's precision.
 
   // Returns the maximum unscaled decimal value that can be stored
   // based on the precision
   int128_t MaxUnscaledDecimal(int8_t precision);
 
   std::string DecimalToString(int128_t value, int8_t scale);
+#endif
 
 } // namespace kudu

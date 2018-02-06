@@ -59,8 +59,10 @@ KuduValue* KuduValue::Clone() const {
       return KuduValue::FromFloat(data_->float_val_);
     case Data::SLICE:
       return KuduValue::CopyString(data_->slice_val_);
+#ifdef KUDU_INT128_SUPPORTED
     case Data::DECIMAL:
       return KuduValue::FromDecimal(data_->decimal_val_, data_->scale_);
+#endif
   }
   LOG(FATAL);
 }
@@ -98,6 +100,7 @@ KuduValue* KuduValue::FromBool(bool v) {
   return new KuduValue(d);
 }
 
+#ifdef KUDU_INT128_SUPPORTED
 KuduValue* KuduValue::FromDecimal(int128_t dv, int8_t scale) {
   auto d = new Data;
   d->type_ = Data::DECIMAL;
@@ -106,6 +109,7 @@ KuduValue* KuduValue::FromDecimal(int128_t dv, int8_t scale) {
 
   return new KuduValue(d);
 }
+#endif
 
 KuduValue* KuduValue::CopyString(Slice s) {
   auto copy = new uint8_t[s.size()];
@@ -146,11 +150,13 @@ Status KuduValue::Data::CheckTypeAndGetPointer(const string& col_name,
       *val_void = &double_val_;
       break;
 
+#ifdef KUDU_INT128_SUPPORTED
     case kudu::DECIMAL32:
     case kudu::DECIMAL64:
     case kudu::DECIMAL128:
       RETURN_NOT_OK(CheckAndPointToDecimal(col_name, t, type_attributes, val_void));
       break;
+#endif
 
     case kudu::BINARY:
     case kudu::STRING:
@@ -213,6 +219,7 @@ Status KuduValue::Data::CheckAndPointToInt(const string& col_name,
   return Status::OK();
 }
 
+#ifdef KUDU_INT128_SUPPORTED
 Status KuduValue::Data::CheckAndPointToDecimal(const string& col_name,
                                                DataType type,
                                                ColumnTypeAttributes type_attributes,
@@ -234,6 +241,7 @@ Status KuduValue::Data::CheckAndPointToDecimal(const string& col_name,
   *val_void = &decimal_val_;
   return Status::OK();
 }
+#endif
 
 Status KuduValue::Data::CheckAndPointToString(const string& col_name,
                                               void** val_void) {
@@ -254,9 +262,11 @@ const Slice KuduValue::Data::GetSlice() {
     case DOUBLE:
       return Slice(reinterpret_cast<uint8_t*>(&double_val_),
                    sizeof(double));
+#ifdef KUDU_INT128_SUPPORTED
     case DECIMAL:
       return Slice(reinterpret_cast<uint8_t*>(&decimal_val_),
                    sizeof(int128_t));
+#endif
 
     case SLICE:
       return slice_val_;

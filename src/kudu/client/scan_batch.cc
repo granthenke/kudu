@@ -154,11 +154,13 @@ Status KuduScanBatch::RowPtr::GetDouble(const Slice& col_name, double* val) cons
   return Get<TypeTraits<DOUBLE> >(col_name, val);
 }
 
+#ifdef KUDU_INT128_SUPPORTED
 Status KuduScanBatch::RowPtr::GetUnscaledDecimal(const Slice& col_name, int128_t* val) const {
   int col_idx;
   RETURN_NOT_OK(FindColumn(*schema_, col_name, &col_idx));
   return GetUnscaledDecimal(col_idx, val);
 }
+#endif
 
 Status KuduScanBatch::RowPtr::GetString(const Slice& col_name, Slice* val) const {
   return Get<TypeTraits<STRING> >(col_name, val);
@@ -259,8 +261,10 @@ Status KuduScanBatch::RowPtr::Get<TypeTraits<INT32> >(const Slice& col_name, int
 template
 Status KuduScanBatch::RowPtr::Get<TypeTraits<INT64> >(const Slice& col_name, int64_t* val) const;
 
+#ifdef KUDU_INT128_SUPPORTED
 template
 Status KuduScanBatch::RowPtr::Get<TypeTraits<INT128> >(const Slice& col_name, int128_t* val) const;
+#endif
 
 template
 Status KuduScanBatch::RowPtr::Get<TypeTraits<UNIXTIME_MICROS> >(
@@ -293,8 +297,10 @@ Status KuduScanBatch::RowPtr::Get<TypeTraits<INT32> >(int col_idx, int32_t* val)
 template
 Status KuduScanBatch::RowPtr::Get<TypeTraits<INT64> >(int col_idx, int64_t* val) const;
 
+#ifdef KUDU_INT128_SUPPORTED
 template
 Status KuduScanBatch::RowPtr::Get<TypeTraits<INT128> >(int col_idx, int128_t* val) const;
+#endif
 
 template
 Status KuduScanBatch::RowPtr::Get<TypeTraits<UNIXTIME_MICROS> >(int col_idx, int64_t* val) const;
@@ -311,6 +317,7 @@ Status KuduScanBatch::RowPtr::Get<TypeTraits<STRING> >(int col_idx, Slice* val) 
 template
 Status KuduScanBatch::RowPtr::Get<TypeTraits<BINARY> >(int col_idx, Slice* val) const;
 
+#ifdef KUDU_INT128_SUPPORTED
 Status KuduScanBatch::RowPtr::GetUnscaledDecimal(int col_idx, int128_t* val) const {
   const ColumnSchema& col = schema_->column(col_idx);
   const DataType col_type = col.type_info()->type();
@@ -336,6 +343,7 @@ Status KuduScanBatch::RowPtr::GetUnscaledDecimal(int col_idx, int128_t* val) con
                      col.type_info()->name(), col.name()));
   }
 }
+#endif
 
 string KuduScanBatch::RowPtr::ToString() const {
   // Client-users calling ToString() will likely expect it to not be redacted.

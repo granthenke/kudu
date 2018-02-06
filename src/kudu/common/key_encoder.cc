@@ -22,6 +22,7 @@
 #include "kudu/common/common.pb.h"
 #include "kudu/common/key_encoder.h"
 #include "kudu/gutil/singleton.h"
+#include "kudu/util/int128.h"
 
 using std::unique_ptr;
 using std::vector;
@@ -54,7 +55,9 @@ class EncoderResolver {
     AddMapping<UINT64>();
     AddMapping<INT64>();
     AddMapping<BINARY>();
+#ifdef KUDU_INT128_SUPPORTED
     AddMapping<INT128>();
+#endif
   }
 
   template<DataType Type> void AddMapping() {

@@ -37,14 +37,18 @@ class KuduValue::Data {
     FLOAT,
     DOUBLE,
     SLICE,
+#ifdef KUDU_INT128_SUPPORTED
     DECIMAL
+#endif
   };
   Type type_;
   union {
     int64_t int_val_;
     float float_val_;
     double double_val_;
+#ifdef KUDU_INT128_SUPPORTED
     int128_t decimal_val_;
+#endif
   };
   Slice slice_val_;
   // Scale is only used with DECIMAL types.

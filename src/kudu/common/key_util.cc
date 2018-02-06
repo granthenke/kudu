@@ -39,6 +39,7 @@
 #include "kudu/gutil/map-util.h"
 #include "kudu/gutil/mathlimits.h"
 #include "kudu/gutil/port.h"
+#include "kudu/util/int128.h"
 #include "kudu/util/memory/arena.h"
 #include "kudu/util/slice.h"
 
@@ -358,7 +359,9 @@ bool IncrementCell(const ColumnSchema& col, void* cell_ptr, Arena* arena) {
     HANDLE_TYPE(INT32);
     HANDLE_TYPE(UNIXTIME_MICROS);
     HANDLE_TYPE(INT64);
+#ifdef KUDU_INT128_SUPPORTED
     HANDLE_TYPE(INT128);
+#endif
     case FLOAT:
       return IncrementFloatingPointCell<FLOAT>(cell_ptr);
     case DOUBLE:
@@ -388,7 +391,9 @@ bool TryDecrementCell(const ColumnSchema &col, void *cell_ptr) {
     HANDLE_TYPE(INT32);
     HANDLE_TYPE(UNIXTIME_MICROS);
     HANDLE_TYPE(INT64);
+#ifdef KUDU_INT128_SUPPORTED
     HANDLE_TYPE(INT128);
+#endif
     case FLOAT:
       return DecrementFloatingPointCell<FLOAT>(cell_ptr);
     case DOUBLE:

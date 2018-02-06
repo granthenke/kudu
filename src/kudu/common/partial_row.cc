@@ -198,6 +198,7 @@ Status KuduPartialRow::Set(int32_t column_idx, const uint8_t* val) {
       RETURN_NOT_OK(SetUnixTimeMicros(column_idx, *reinterpret_cast<const int64_t*>(val)));
       break;
     };
+#ifdef KUDU_INT128_SUPPORTED
     case DECIMAL32: {
       RETURN_NOT_OK(Set<TypeTraits<DECIMAL32> >(column_idx,
                                                 *reinterpret_cast<const int32_t*>(val)));
@@ -213,6 +214,7 @@ Status KuduPartialRow::Set(int32_t column_idx, const uint8_t* val) {
                                                  *reinterpret_cast<const int128_t*>(val)));
       break;
     };
+#endif
     default: {
       return Status::InvalidArgument("Unknown column type in schema",
                                      column_schema.ToString());
@@ -270,11 +272,13 @@ Status KuduPartialRow::SetFloat(const Slice& col_name, float val) {
 Status KuduPartialRow::SetDouble(const Slice& col_name, double val) {
   return Set<TypeTraits<DOUBLE> >(col_name, val);
 }
+#ifdef KUDU_INT128_SUPPORTED
 Status KuduPartialRow::SetUnscaledDecimal(const Slice& col_name, int128_t val) {
   int col_idx;
   RETURN_NOT_OK(FindColumn(*schema_, col_name, &col_idx));
   return SetUnscaledDecimal(col_idx, val);
 }
+#endif
 Status KuduPartialRow::SetBool(int col_idx, bool val) {
   return Set<TypeTraits<BOOL> >(col_idx, val);
 }
@@ -299,6 +303,7 @@ Status KuduPartialRow::SetFloat(int col_idx, float val) {
 Status KuduPartialRow::SetDouble(int col_idx, double val) {
   return Set<TypeTraits<DOUBLE> >(col_idx, val);
 }
+#ifdef KUDU_INT128_SUPPORTED
 Status KuduPartialRow::SetUnscaledDecimal(int col_idx, int128_t val) {
   const ColumnSchema& col = schema_->column(col_idx);
   const DataType col_type = col.type_info()->type();
@@ -323,6 +328,7 @@ Status KuduPartialRow::SetUnscaledDecimal(int col_idx, int128_t val) {
                      col.type_info()->name(), col.name()));
   }
 }
+#endif
 
 Status KuduPartialRow::SetBinary(const Slice& col_name, const Slice& val) {
   return SetBinaryCopy(col_name, val);
@@ -460,10 +466,12 @@ Status KuduPartialRow::Set<TypeTraits<INT64> >(int col_idx,
                                                const TypeTraits<INT64>::cpp_type& val,
                                                bool owned);
 
+#ifdef KUDU_INT128_SUPPORTED
 template
 Status KuduPartialRow::Set<TypeTraits<INT128> >(int col_idx,
                                                const TypeTraits<INT128>::cpp_type& val,
                                                bool owned);
+#endif
 
 template
 Status KuduPartialRow::Set<TypeTraits<UNIXTIME_MICROS> >(
@@ -516,10 +524,12 @@ Status KuduPartialRow::Set<TypeTraits<INT64> >(const Slice& col_name,
                                                const TypeTraits<INT64>::cpp_type& val,
                                                bool owned);
 
+#ifdef KUDU_INT128_SUPPORTED
 template
 Status KuduPartialRow::Set<TypeTraits<INT128> >(const Slice& col_name,
                                                 const TypeTraits<INT128>::cpp_type& val,
                                                 bool owned);
+#endif
 
 template
 Status KuduPartialRow::Set<TypeTraits<UNIXTIME_MICROS> >(
@@ -610,11 +620,13 @@ Status KuduPartialRow::GetFloat(const Slice& col_name, float* val) const {
 Status KuduPartialRow::GetDouble(const Slice& col_name, double* val) const {
   return Get<TypeTraits<DOUBLE> >(col_name, val);
 }
+#ifdef KUDU_INT128_SUPPORTED
 Status KuduPartialRow::GetUnscaledDecimal(const Slice &col_name, int128_t *val) {
   int col_idx;
   RETURN_NOT_OK(FindColumn(*schema_, col_name, &col_idx));
   return GetUnscaledDecimal(col_idx, val);
 }
+#endif
 Status KuduPartialRow::GetString(const Slice& col_name, Slice* val) const {
   return Get<TypeTraits<STRING> >(col_name, val);
 }
@@ -646,6 +658,7 @@ Status KuduPartialRow::GetFloat(int col_idx, float* val) const {
 Status KuduPartialRow::GetDouble(int col_idx, double* val) const {
   return Get<TypeTraits<DOUBLE> >(col_idx, val);
 }
+#ifdef KUDU_INT128_SUPPORTED
 Status KuduPartialRow::GetUnscaledDecimal(int col_idx, int128_t *val) {
   const ColumnSchema& col = schema_->column(col_idx);
   const DataType col_type = col.type_info()->type();
@@ -671,6 +684,7 @@ Status KuduPartialRow::GetUnscaledDecimal(int col_idx, int128_t *val) {
                      col.type_info()->name(), col.name()));
   }
 }
+#endif
 Status KuduPartialRow::GetString(int col_idx, Slice* val) const {
   return Get<TypeTraits<STRING> >(col_idx, val);
 }

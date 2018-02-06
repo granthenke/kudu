@@ -84,10 +84,12 @@ class TypeInfoResolver {
     AddMapping<FLOAT>();
     AddMapping<DOUBLE>();
     AddMapping<BINARY>();
+#ifdef KUDU_INT128_SUPPORTED
     AddMapping<INT128>();
     AddMapping<DECIMAL32>();
     AddMapping<DECIMAL64>();
     AddMapping<DECIMAL128>();
+#endif
   }
 
   template<DataType type> void AddMapping() {

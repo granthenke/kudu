@@ -324,6 +324,7 @@ struct DataTypeTraits<INT64> {
   }
 };
 
+#ifdef KUDU_INT128_SUPPORTED
 template<>
 struct DataTypeTraits<INT128> {
   static const DataType physical_type = INT128;
@@ -347,6 +348,7 @@ struct DataTypeTraits<INT128> {
     return &INT128_MAX;
   }
 };
+#endif
 
 template<>
 struct DataTypeTraits<FLOAT> {
@@ -534,6 +536,7 @@ struct DataTypeTraits<UNIXTIME_MICROS> : public DerivedTypeTraits<INT64>{
   }
 };
 
+#ifdef KUDU_INT128_SUPPORTED
 template<>
 struct DataTypeTraits<DECIMAL32> : public DerivedTypeTraits<INT32>{
   static const char* name() {
@@ -575,6 +578,7 @@ struct DataTypeTraits<DECIMAL128> : public DerivedTypeTraits<INT128>{
     str->append("_D128");
   }
 };
+#endif
 
 // Instantiate this template to get static access to the type traits.
 template<DataType datatype>
@@ -647,10 +651,12 @@ class Variant {
       case UINT64:
         numeric_.u64 = *static_cast<const uint64_t *>(value);
         break;
+#ifdef KUDU_INT128_SUPPORTED
       case DECIMAL128:
       case INT128:
         numeric_.i128 = *static_cast<const int128_t *>(value);
         break;
+#endif
       case FLOAT:
         numeric_.float_val = *static_cast<const float *>(value);
         break;
@@ -718,8 +724,10 @@ class Variant {
       case UNIXTIME_MICROS:
       case INT64:        return &(numeric_.i64);
       case UINT64:       return &(numeric_.u64);
+#ifdef KUDU_INT128_SUPPORTED
       case DECIMAL128:
       case INT128:       return &(numeric_.i128);
+#endif
       case FLOAT:        return (&numeric_.float_val);
       case DOUBLE:       return (&numeric_.double_val);
       case STRING:
@@ -759,7 +767,9 @@ class Variant {
     uint32_t u32;
     int64_t  i64;
     uint64_t u64;
+#ifdef KUDU_INT128_SUPPORTED
     int128_t i128;
+#endif
     float    float_val;
     double   double_val;
   };
