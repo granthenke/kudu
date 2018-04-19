@@ -27,6 +27,8 @@ from setuptools import setup
 from distutils.command.clean import clean as _clean
 from distutils.extension import Extension
 import os
+import re
+import subprocess
 
 # Workaround a Python bug in which multiprocessing's atexit handler doesn't
 # play well with pytest. See http://bugs.python.org/issue15881 for details
@@ -64,13 +66,71 @@ def write_version_py(filename=os.path.join(setup_dir, 'kudu/version.py')):
 class clean(_clean):
     def run(self):
         _clean.run(self)
-        for x in ['kudu/client.cpp', 'kudu/schema.cpp',
-                  'kudu/errors.cpp']:
+        for x in [
+            'kudu/client.cpp',
+            'kudu/schema.cpp',
+            'kudu/errors.cpp',
+            'kudu/config.pxi'
+        ]:
             try:
                 os.remove(x)
             except OSError:
                 pass
 
+def log_failure(error_msg, exc=None):
+    print("*** " + error_msg)
+    if exc:
+        print(exc.message)
+        print("")
+    print("Please refer to docs/installation.adoc for complete installation ")
+    print("instructions for your platform.")
+
+def try_do(status_msg, error_msg, func):
+    print(status_msg + " ...")
+    try:
+        func()
+        return True
+    except Exception as e:
+        log_failure(error_msg, e)
+        return False
+
+def compile(script, flags=None):
+  if flags is None:
+    flags = []
+
+  p = subprocess.Popen(['cc', '-o', '/dev/null', '-c', '-x', 'c++', '-'] + flags,
+      stderr=subprocess.PIPE,
+      stdout=subprocess.PIPE,
+      stdin=subprocess.PIPE,
+      universal_newlines=True)
+
+  stdout, stderr = p.communicate(input=script)
+  if p.returncode != 0:
+    raise Exception("Compilation failed: " + stderr)
+
+# Check that the __int128 type is available
+def supports_int128():
+    return try_do(
+        "Checking for __int128 type support",
+        ("Unable to compile a simple program that uses __int128. " +
+         "Decimal support is disabled."),
+        lambda: compile("""
+        typedef signed __int128 int128_t;
+        """,
+        flags=["-E"]))
+
+# Generating config.pxi
+c_options = {
+    # Remove when dropping el6 support and all cases of
+    # "IF KUDU_INT128_SUPPORTED" in the code.
+    'kudu_int128_supported': supports_int128()
+}
+config_file = os.path.join('kudu', 'config.pxi')
+if not os.path.exists(config_file):
+    with open(config_file, 'w') as f:
+        f.write('# THIS FILE IS GENERATED FROM SETUP.PY\n')
+        for k, v in c_options.items():
+            f.write('DEF %s = %d\n' % (k.upper(), int(v)))
 
 # If we're in the context of the Kudu git repository, build against the
 # latest in-tree build artifacts

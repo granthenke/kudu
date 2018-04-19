@@ -17,6 +17,8 @@
 
 # distutils: language = c++
 
+include "config.pxi"
+
 from libc.stdint cimport *
 from libcpp cimport bool as c_bool
 from libcpp.string cimport string
@@ -62,8 +64,9 @@ cdef extern from "kudu/util/status.h" namespace "kudu" nogil:
         c_bool IsNotAuthorized()
         c_bool IsAborted()
 
-cdef extern from "kudu/util/int128.h" namespace "kudu":
-    ctypedef int int128_t
+IF KUDU_INT128_SUPPORTED == 1:
+    cdef extern from "kudu/util/int128.h" namespace "kudu":
+        ctypedef int int128_t
 
 cdef extern from "kudu/util/monotime.h" namespace "kudu" nogil:
 
@@ -218,51 +221,94 @@ cdef extern from "kudu/client/scan_batch.h" namespace "kudu::client" nogil:
         KuduRowPtr Row(int idx) const;
         const KuduSchema* projection_schema() const;
 
-    cdef cppclass KuduRowPtr " kudu::client::KuduScanBatch::RowPtr":
-        c_bool IsNull(Slice& col_name)
-        c_bool IsNull(int col_idx)
+    IF KUDU_INT128_SUPPORTED == 1:
+        cdef cppclass KuduRowPtr " kudu::client::KuduScanBatch::RowPtr":
+            c_bool IsNull(Slice& col_name)
+            c_bool IsNull(int col_idx)
 
-        # These getters return a bad Status if the type does not match,
-        # the value is unset, or the value is NULL. Otherwise they return
-        # the current set value in *val.
-        Status GetBool(Slice& col_name, c_bool* val)
-        Status GetBool(int col_idx, c_bool* val)
+            # These getters return a bad Status if the type does not match,
+            # the value is unset, or the value is NULL. Otherwise they return
+            # the current set value in *val.
+            Status GetBool(Slice& col_name, c_bool* val)
+            Status GetBool(int col_idx, c_bool* val)
 
-        Status GetInt8(Slice& col_name, int8_t* val)
-        Status GetInt8(int col_idx, int8_t* val)
+            Status GetInt8(Slice& col_name, int8_t* val)
+            Status GetInt8(int col_idx, int8_t* val)
 
-        Status GetInt16(Slice& col_name, int16_t* val)
-        Status GetInt16(int col_idx, int16_t* val)
+            Status GetInt16(Slice& col_name, int16_t* val)
+            Status GetInt16(int col_idx, int16_t* val)
 
-        Status GetInt32(Slice& col_name, int32_t* val)
-        Status GetInt32(int col_idx, int32_t* val)
+            Status GetInt32(Slice& col_name, int32_t* val)
+            Status GetInt32(int col_idx, int32_t* val)
 
-        Status GetInt64(Slice& col_name, int64_t* val)
-        Status GetInt64(int col_idx, int64_t* val)
+            Status GetInt64(Slice& col_name, int64_t* val)
+            Status GetInt64(int col_idx, int64_t* val)
 
-        Status GetUnixTimeMicros(const Slice& col_name,
-                            int64_t* micros_since_utc_epoch)
-        Status GetUnixTimeMicros(int col_idx,
-                            int64_t* micros_since_utc_epoch)
+            Status GetUnixTimeMicros(const Slice& col_name,
+                                int64_t* micros_since_utc_epoch)
+            Status GetUnixTimeMicros(int col_idx,
+                                int64_t* micros_since_utc_epoch)
 
+            Status GetFloat(Slice& col_name, float* val)
+            Status GetFloat(int col_idx, float* val)
 
-        Status GetFloat(Slice& col_name, float* val)
-        Status GetFloat(int col_idx, float* val)
+            Status GetDouble(Slice& col_name, double* val)
+            Status GetDouble(int col_idx, double* val)
 
-        Status GetDouble(Slice& col_name, double* val)
-        Status GetDouble(int col_idx, double* val)
+            Status GetUnscaledDecimal(Slice& col_name, int128_t* val)
+            Status GetUnscaledDecimal(int col_idx, int128_t* val)
 
-        Status GetUnscaledDecimal(Slice& col_name, int128_t* val)
-        Status GetUnscaledDecimal(int col_idx, int128_t* val)
+            Status GetString(Slice& col_name, Slice* val)
+            Status GetString(int col_idx, Slice* val)
 
-        Status GetString(Slice& col_name, Slice* val)
-        Status GetString(int col_idx, Slice* val)
+            Status GetBinary(const Slice& col_name, Slice* val)
+            Status GetBinary(int col_idx, Slice* val)
 
-        Status GetBinary(const Slice& col_name, Slice* val)
-        Status GetBinary(int col_idx, Slice* val)
+            const void* cell(int col_idx)
+            string ToString()
+    # A copy of above except for int128 methods
+    ELSE:
+        cdef cppclass KuduRowPtr " kudu::client::KuduScanBatch::RowPtr":
+            c_bool IsNull(Slice& col_name)
+            c_bool IsNull(int col_idx)
 
-        const void* cell(int col_idx)
-        string ToString()
+            # These getters return a bad Status if the type does not match,
+            # the value is unset, or the value is NULL. Otherwise they return
+            # the current set value in *val.
+            Status GetBool(Slice& col_name, c_bool* val)
+            Status GetBool(int col_idx, c_bool* val)
+
+            Status GetInt8(Slice& col_name, int8_t* val)
+            Status GetInt8(int col_idx, int8_t* val)
+
+            Status GetInt16(Slice& col_name, int16_t* val)
+            Status GetInt16(int col_idx, int16_t* val)
+
+            Status GetInt32(Slice& col_name, int32_t* val)
+            Status GetInt32(int col_idx, int32_t* val)
+
+            Status GetInt64(Slice& col_name, int64_t* val)
+            Status GetInt64(int col_idx, int64_t* val)
+
+            Status GetUnixTimeMicros(const Slice& col_name,
+                                int64_t* micros_since_utc_epoch)
+            Status GetUnixTimeMicros(int col_idx,
+                                int64_t* micros_since_utc_epoch)
+
+            Status GetFloat(Slice& col_name, float* val)
+            Status GetFloat(int col_idx, float* val)
+
+            Status GetDouble(Slice& col_name, double* val)
+            Status GetDouble(int col_idx, double* val)
+
+            Status GetString(Slice& col_name, Slice* val)
+            Status GetString(int col_idx, Slice* val)
+
+            Status GetBinary(const Slice& col_name, Slice* val)
+            Status GetBinary(int col_idx, Slice* val)
+
+            const void* cell(int col_idx)
+            string ToString()
 
 cdef extern from "kudu/util/slice.h" namespace "kudu" nogil:
 
@@ -306,120 +352,228 @@ cdef extern from "kudu/util/slice.h" namespace "kudu" nogil:
 
 cdef extern from "kudu/common/partial_row.h" namespace "kudu" nogil:
 
-    cdef cppclass KuduPartialRow:
-        # Schema must not be garbage-collected
-        # KuduPartialRow(const Schema* schema)
+    IF KUDU_INT128_SUPPORTED == 1:
+        cdef cppclass KuduPartialRow:
+            # Schema must not be garbage-collected
+            # KuduPartialRow(const Schema* schema)
 
-        #----------------------------------------------------------------------
-        # Setters
+            #----------------------------------------------------------------------
+            # Setters
 
-        # Slice setters
-        Status SetBool(Slice& col_name, c_bool val)
+            # Slice setters
+            Status SetBool(Slice& col_name, c_bool val)
 
-        Status SetInt8(Slice& col_name, int8_t val)
-        Status SetInt16(Slice& col_name, int16_t val)
-        Status SetInt32(Slice& col_name, int32_t val)
-        Status SetInt64(Slice& col_name, int64_t val)
+            Status SetInt8(Slice& col_name, int8_t val)
+            Status SetInt16(Slice& col_name, int16_t val)
+            Status SetInt32(Slice& col_name, int32_t val)
+            Status SetInt64(Slice& col_name, int64_t val)
 
-        Status SetUnixTimeMicros(const Slice& col_name,
-                                 int64_t micros_since_utc_epoch)
-        Status SetUnixTimeMicros(int col_idx, int64_t micros_since_utc_epoch)
+            Status SetUnixTimeMicros(const Slice& col_name,
+                                     int64_t micros_since_utc_epoch)
+            Status SetUnixTimeMicros(int col_idx, int64_t micros_since_utc_epoch)
 
-        Status SetDouble(Slice& col_name, double val)
-        Status SetFloat(Slice& col_name, float val)
+            Status SetDouble(Slice& col_name, double val)
+            Status SetFloat(Slice& col_name, float val)
 
-        Status SetUnscaledDecimal(const Slice& col_name, int128_t val)
+            Status SetUnscaledDecimal(const Slice& col_name, int128_t val)
 
-        # Integer setters
-        Status SetBool(int col_idx, c_bool val)
+            # Integer setters
+            Status SetBool(int col_idx, c_bool val)
 
-        Status SetInt8(int col_idx, int8_t val)
-        Status SetInt16(int col_idx, int16_t val)
-        Status SetInt32(int col_idx, int32_t val)
-        Status SetInt64(int col_idx, int64_t val)
+            Status SetInt8(int col_idx, int8_t val)
+            Status SetInt16(int col_idx, int16_t val)
+            Status SetInt32(int col_idx, int32_t val)
+            Status SetInt64(int col_idx, int64_t val)
 
-        Status SetDouble(int col_idx, double val)
-        Status SetFloat(int col_idx, float val)
+            Status SetDouble(int col_idx, double val)
+            Status SetFloat(int col_idx, float val)
 
-        Status SetUnscaledDecimal(int col_idx, int128_t val)
+            Status SetUnscaledDecimal(int col_idx, int128_t val)
 
-        # Set, but does not copy string
-        Status SetString(Slice& col_name, Slice& val)
-        Status SetString(int col_idx, Slice& val)
+            # Set, but does not copy string
+            Status SetString(Slice& col_name, Slice& val)
+            Status SetString(int col_idx, Slice& val)
 
-        Status SetStringCopy(Slice& col_name, Slice& val)
-        Status SetStringCopy(int col_idx, Slice& val)
+            Status SetStringCopy(Slice& col_name, Slice& val)
+            Status SetStringCopy(int col_idx, Slice& val)
 
-        Status SetBinary(Slice& col_name, Slice& val)
-        Status SetBinary(int col_idx, Slice&val)
+            Status SetBinary(Slice& col_name, Slice& val)
+            Status SetBinary(int col_idx, Slice&val)
 
-        Status SetBinaryCopy(const Slice& col_name, const Slice& val)
-        Status SetBinaryCopy(int col_idx, const Slice& val)
+            Status SetBinaryCopy(const Slice& col_name, const Slice& val)
+            Status SetBinaryCopy(int col_idx, const Slice& val)
 
-        Status SetNull(Slice& col_name)
-        Status SetNull(int col_idx)
+            Status SetNull(Slice& col_name)
+            Status SetNull(int col_idx)
 
-        Status Unset(Slice& col_name)
-        Status Unset(int col_idx)
+            Status Unset(Slice& col_name)
+            Status Unset(int col_idx)
 
-        #----------------------------------------------------------------------
-        # Getters
+            #----------------------------------------------------------------------
+            # Getters
 
-        c_bool IsColumnSet(Slice& col_name)
-        c_bool IsColumnSet(int col_idx)
+            c_bool IsColumnSet(Slice& col_name)
+            c_bool IsColumnSet(int col_idx)
 
-        c_bool IsNull(Slice& col_name)
-        c_bool IsNull(int col_idx)
+            c_bool IsNull(Slice& col_name)
+            c_bool IsNull(int col_idx)
 
-        Status GetBool(Slice& col_name, c_bool* val)
-        Status GetBool(int col_idx, c_bool* val)
+            Status GetBool(Slice& col_name, c_bool* val)
+            Status GetBool(int col_idx, c_bool* val)
 
-        Status GetInt8(Slice& col_name, int8_t* val)
-        Status GetInt8(int col_idx, int8_t* val)
+            Status GetInt8(Slice& col_name, int8_t* val)
+            Status GetInt8(int col_idx, int8_t* val)
 
-        Status GetInt16(Slice& col_name, int16_t* val)
-        Status GetInt16(int col_idx, int16_t* val)
+            Status GetInt16(Slice& col_name, int16_t* val)
+            Status GetInt16(int col_idx, int16_t* val)
 
-        Status GetInt32(Slice& col_name, int32_t* val)
-        Status GetInt32(int col_idx, int32_t* val)
+            Status GetInt32(Slice& col_name, int32_t* val)
+            Status GetInt32(int col_idx, int32_t* val)
 
-        Status GetInt64(Slice& col_name, int64_t* val)
-        Status GetInt64(int col_idx, int64_t* val)
+            Status GetInt64(Slice& col_name, int64_t* val)
+            Status GetInt64(int col_idx, int64_t* val)
 
-        Status GetUnixTimeMicros(const Slice& col_name,
-                            int64_t* micros_since_utc_epoch)
-        Status GetUnixTimeMicros(int col_idx, int64_t* micros_since_utc_epoch)
+            Status GetUnixTimeMicros(const Slice& col_name,
+                                int64_t* micros_since_utc_epoch)
+            Status GetUnixTimeMicros(int col_idx, int64_t* micros_since_utc_epoch)
 
-        Status GetDouble(Slice& col_name, double* val)
-        Status GetDouble(int col_idx, double* val)
+            Status GetDouble(Slice& col_name, double* val)
+            Status GetDouble(int col_idx, double* val)
 
-        Status GetFloat(Slice& col_name, float* val)
-        Status GetFloat(int col_idx, float* val)
+            Status GetFloat(Slice& col_name, float* val)
+            Status GetFloat(int col_idx, float* val)
 
-        Status GetUnscaledDecimal(Slice& col_name, int128_t* val)
-        Status GetUnscaledDecimal(int col_idx, int128_t* val)
+            Status GetUnscaledDecimal(Slice& col_name, int128_t* val)
+            Status GetUnscaledDecimal(int col_idx, int128_t* val)
 
-        # Gets the string but does not copy the value. Callers should
-        # copy the resulting Slice if necessary.
-        Status GetString(Slice& col_name, Slice* val)
-        Status GetString(int col_idx, Slice* val)
+            # Gets the string but does not copy the value. Callers should
+            # copy the resulting Slice if necessary.
+            Status GetString(Slice& col_name, Slice* val)
+            Status GetString(int col_idx, Slice* val)
 
-        Status GetBinary(const Slice& col_name, Slice* val)
-        Status GetBinary(int col_idx, Slice* val)
+            Status GetBinary(const Slice& col_name, Slice* val)
+            Status GetBinary(int col_idx, Slice* val)
 
-        Status EncodeRowKey(string* encoded_key)
-        string ToEncodedRowKeyOrDie()
+            Status EncodeRowKey(string* encoded_key)
+            string ToEncodedRowKeyOrDie()
 
-        # Return true if all of the key columns have been specified
-        # for this mutation.
-        c_bool IsKeySet()
+            # Return true if all of the key columns have been specified
+            # for this mutation.
+            c_bool IsKeySet()
 
-        # Return true if all columns have been specified.
-        c_bool AllColumnsSet()
-        string ToString()
+            # Return true if all columns have been specified.
+            c_bool AllColumnsSet()
+            string ToString()
 
-        # const Schema* schema()
+            # const Schema* schema()
+    # A copy of above except for int128 methods
+    ELSE:
+        cdef cppclass KuduPartialRow:
+            # Schema must not be garbage-collected
+            # KuduPartialRow(const Schema* schema)
 
+            #----------------------------------------------------------------------
+            # Setters
+
+            # Slice setters
+            Status SetBool(Slice& col_name, c_bool val)
+
+            Status SetInt8(Slice& col_name, int8_t val)
+            Status SetInt16(Slice& col_name, int16_t val)
+            Status SetInt32(Slice& col_name, int32_t val)
+            Status SetInt64(Slice& col_name, int64_t val)
+
+            Status SetUnixTimeMicros(const Slice& col_name,
+                                     int64_t micros_since_utc_epoch)
+            Status SetUnixTimeMicros(int col_idx, int64_t micros_since_utc_epoch)
+
+            Status SetDouble(Slice& col_name, double val)
+            Status SetFloat(Slice& col_name, float val)
+
+            # Integer setters
+            Status SetBool(int col_idx, c_bool val)
+
+            Status SetInt8(int col_idx, int8_t val)
+            Status SetInt16(int col_idx, int16_t val)
+            Status SetInt32(int col_idx, int32_t val)
+            Status SetInt64(int col_idx, int64_t val)
+
+            Status SetDouble(int col_idx, double val)
+            Status SetFloat(int col_idx, float val)
+
+            # Set, but does not copy string
+            Status SetString(Slice& col_name, Slice& val)
+            Status SetString(int col_idx, Slice& val)
+
+            Status SetStringCopy(Slice& col_name, Slice& val)
+            Status SetStringCopy(int col_idx, Slice& val)
+
+            Status SetBinary(Slice& col_name, Slice& val)
+            Status SetBinary(int col_idx, Slice&val)
+
+            Status SetBinaryCopy(const Slice& col_name, const Slice& val)
+            Status SetBinaryCopy(int col_idx, const Slice& val)
+
+            Status SetNull(Slice& col_name)
+            Status SetNull(int col_idx)
+
+            Status Unset(Slice& col_name)
+            Status Unset(int col_idx)
+
+            #----------------------------------------------------------------------
+            # Getters
+
+            c_bool IsColumnSet(Slice& col_name)
+            c_bool IsColumnSet(int col_idx)
+
+            c_bool IsNull(Slice& col_name)
+            c_bool IsNull(int col_idx)
+
+            Status GetBool(Slice& col_name, c_bool* val)
+            Status GetBool(int col_idx, c_bool* val)
+
+            Status GetInt8(Slice& col_name, int8_t* val)
+            Status GetInt8(int col_idx, int8_t* val)
+
+            Status GetInt16(Slice& col_name, int16_t* val)
+            Status GetInt16(int col_idx, int16_t* val)
+
+            Status GetInt32(Slice& col_name, int32_t* val)
+            Status GetInt32(int col_idx, int32_t* val)
+
+            Status GetInt64(Slice& col_name, int64_t* val)
+            Status GetInt64(int col_idx, int64_t* val)
+
+            Status GetUnixTimeMicros(const Slice& col_name,
+                                int64_t* micros_since_utc_epoch)
+            Status GetUnixTimeMicros(int col_idx, int64_t* micros_since_utc_epoch)
+
+            Status GetDouble(Slice& col_name, double* val)
+            Status GetDouble(int col_idx, double* val)
+
+            Status GetFloat(Slice& col_name, float* val)
+            Status GetFloat(int col_idx, float* val)
+
+            # Gets the string but does not copy the value. Callers should
+            # copy the resulting Slice if necessary.
+            Status GetString(Slice& col_name, Slice* val)
+            Status GetString(int col_idx, Slice* val)
+
+            Status GetBinary(const Slice& col_name, Slice* val)
+            Status GetBinary(int col_idx, Slice* val)
+
+            Status EncodeRowKey(string* encoded_key)
+            string ToEncodedRowKeyOrDie()
+
+            # Return true if all of the key columns have been specified
+            # for this mutation.
+            c_bool IsKeySet()
+
+            # Return true if all columns have been specified.
+            c_bool AllColumnsSet()
+            string ToString()
+
+            # const Schema* schema()
 
 cdef extern from "kudu/client/write_op.h" namespace "kudu::client" nogil:
 
@@ -466,24 +620,43 @@ cdef extern from "kudu/client/scan_predicate.h" namespace "kudu::client" nogil:
 
 cdef extern from "kudu/client/value.h" namespace "kudu::client" nogil:
 
-    cdef cppclass C_KuduValue "kudu::client::KuduValue":
-        @staticmethod
-        C_KuduValue* FromInt(int64_t val);
+    IF KUDU_INT128_SUPPORTED == 1:
+        cdef cppclass C_KuduValue "kudu::client::KuduValue":
+            @staticmethod
+            C_KuduValue* FromInt(int64_t val);
 
-        @staticmethod
-        C_KuduValue* FromFloat(float val);
+            @staticmethod
+            C_KuduValue* FromFloat(float val);
 
-        @staticmethod
-        C_KuduValue* FromDouble(double val);
+            @staticmethod
+            C_KuduValue* FromDouble(double val);
 
-        @staticmethod
-        C_KuduValue* FromBool(c_bool val);
+            @staticmethod
+            C_KuduValue* FromBool(c_bool val);
 
-        @staticmethod
-        C_KuduValue* FromDecimal(int128_t val, int8_t scale);
+            @staticmethod
+            C_KuduValue* FromDecimal(int128_t val, int8_t scale);
 
-        @staticmethod
-        C_KuduValue* CopyString(const Slice& s);
+            @staticmethod
+            C_KuduValue* CopyString(const Slice& s);
+    # A copy of above except for int128 methods
+    ELSE:
+        cdef cppclass C_KuduValue "kudu::client::KuduValue":
+            @staticmethod
+            C_KuduValue* FromInt(int64_t val);
+
+            @staticmethod
+            C_KuduValue* FromFloat(float val);
+
+            @staticmethod
+            C_KuduValue* FromDouble(double val);
+
+            @staticmethod
+            C_KuduValue* FromBool(c_bool val);
+
+            @staticmethod
+            C_KuduValue* CopyString(const Slice& s);
+
 
 
 cdef extern from "kudu/client/client.h" namespace "kudu::client" nogil:
