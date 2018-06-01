@@ -19,6 +19,7 @@ package org.apache.kudu.client;
 
 import java.util.List;
 
+import com.google.common.base.Objects;
 import org.apache.yetus.audience.InterfaceAudience;
 import org.apache.yetus.audience.InterfaceStability;
 
@@ -102,6 +103,21 @@ public class PartitionSchema {
     return isSimple;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    PartitionSchema schema = (PartitionSchema) o;
+    return Objects.equal(rangeSchema, schema.rangeSchema) &&
+        Objects.equal(hashBucketSchemas, schema.hashBucketSchemas) &&
+        Objects.equal(isSimple, schema.isSimple);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(rangeSchema, hashBucketSchemas);
+  }
+
   public static class RangeSchema {
     private final List<Integer> columns;
 
@@ -125,6 +141,19 @@ public class PartitionSchema {
      */
     public List<Integer> getColumnIds() {
       return columns;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      RangeSchema that = (RangeSchema) o;
+      return Objects.equal(columns, that.columns);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hashCode(columns);
     }
   }
 
@@ -153,6 +182,21 @@ public class PartitionSchema {
 
     public int getSeed() {
       return seed;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      HashBucketSchema that = (HashBucketSchema) o;
+      return Objects.equal(columnIds, that.columnIds) &&
+          Objects.equal(numBuckets, that.numBuckets) &&
+          Objects.equal(seed, that.seed);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hashCode(columnIds, numBuckets, seed);
     }
   }
 }

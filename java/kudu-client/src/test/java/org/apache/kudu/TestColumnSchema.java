@@ -20,7 +20,9 @@ import org.apache.kudu.ColumnSchema.ColumnSchemaBuilder;
 import org.apache.kudu.util.DecimalUtil;
 import org.junit.Test;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class TestColumnSchema {
 
@@ -35,5 +37,32 @@ public class TestColumnSchema {
     assertEquals("Column name: col1, type: string", col1.toString());
     assertEquals("Column name: col2, type: int64", col2.toString());
     assertEquals("Column name: col3, type: decimal(5, 2)", col3.toString());
+  }
+
+  @Test
+  public void testEquals() {
+    ColumnSchema stringCol1 = new ColumnSchemaBuilder("col1", Type.STRING)
+        .defaultValue("test")
+        .build();
+    ColumnSchema stringCol2 = new ColumnSchemaBuilder("col1", Type.STRING)
+        .defaultValue("test")
+        .build();
+    assertEquals(stringCol1, stringCol2);
+
+    ColumnSchema stringCol3 = new ColumnSchemaBuilder("col1", Type.STRING)
+        .key(true)
+        .build();
+    assertNotEquals(stringCol1, stringCol3);
+  }
+
+  @Test
+  public void testEqualsWithBinaryDefault() {
+    ColumnSchema binaryCol1 = new ColumnSchemaBuilder("col1", Type.BINARY)
+        .defaultValue("array of bytes".getBytes(UTF_8))
+        .build();
+    ColumnSchema binaryCol2 = new ColumnSchemaBuilder("col1", Type.BINARY)
+        .defaultValue("array of bytes".getBytes(UTF_8))
+        .build();
+    assertEquals(binaryCol1, binaryCol2);
   }
 }

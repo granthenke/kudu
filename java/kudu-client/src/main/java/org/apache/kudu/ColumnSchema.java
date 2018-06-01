@@ -17,13 +17,14 @@
 
 package org.apache.kudu;
 
-import java.util.Objects;
-
+import com.google.common.base.Objects;
 import org.apache.yetus.audience.InterfaceAudience;
 import org.apache.yetus.audience.InterfaceStability;
 
 import org.apache.kudu.Common.EncodingType;
 import org.apache.kudu.Compression.CompressionType;
+
+import java.util.Arrays;
 
 /**
  * Represents a Kudu Table column. Use {@link ColumnSchema.ColumnSchemaBuilder} in order to
@@ -195,34 +196,40 @@ public class ColumnSchema {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
     ColumnSchema that = (ColumnSchema) o;
+    return Objects.equal(name, that.name) &&
+        Objects.equal(type, that.type) &&
+        Objects.equal(key, that.key) &&
+        Objects.equal(nullable, that.nullable) &&
+        defaultValueEquals(defaultValue, that.defaultValue) &&
+        Objects.equal(desiredBlockSize, that.desiredBlockSize) &&
+        Objects.equal(encoding, that.encoding) &&
+        Objects.equal(compressionAlgorithm, that.compressionAlgorithm) &&
+        Objects.equal(typeAttributes, that.typeAttributes) &&
+        // typeSize isn't required but included for simplicity
+        Objects.equal(typeSize, that.typeSize);
+  }
 
-    if (key != that.key) {
-      return false;
+  // Special handling because default values can be a byte array which is not
+  // handled by Guava's Objects.equals.
+  // See https://github.com/google/guava/issues/1425
+  private boolean defaultValueEquals(Object thisDefaultValue, Object thatDefaultValue) {
+    if (thisDefaultValue == thatDefaultValue) return true;
+    if (thisDefaultValue == null || thatDefaultValue == null) return false;
+    if (thisDefaultValue.getClass() != thatDefaultValue.getClass()) return false;
+    if (thisDefaultValue instanceof byte[]) {
+      return Arrays.equals((byte[]) thisDefaultValue, (byte[]) thatDefaultValue);
+    } else {
+      return Objects.equal(thisDefaultValue, thatDefaultValue);
     }
-    if (!name.equals(that.name)) {
-      return false;
-    }
-    if (!type.equals(that.type)) {
-      return false;
-    }
-    if (!typeAttributes.equals(that.typeAttributes)) {
-      return false;
-    }
-
-    return true;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, type, key, typeAttributes);
+    return Objects.hashCode(name, type, key, nullable, defaultValue, desiredBlockSize,
+        encoding, compressionAlgorithm, typeAttributes, typeSize);
   }
 
   @Override

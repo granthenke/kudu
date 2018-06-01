@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import org.apache.yetus.audience.InterfaceAudience;
 import org.apache.yetus.audience.InterfaceStability;
@@ -292,5 +293,18 @@ public class Schema {
    */
   public PartialRow newPartialRow() {
     return new PartialRow(this);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Schema schema = (Schema) o;
+    return Objects.equal(columnsByIndex, schema.columnsByIndex);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(columnsByIndex);
   }
 }
