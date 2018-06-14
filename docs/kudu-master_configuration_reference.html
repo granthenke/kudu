@@ -2,7 +2,7 @@
 title: kudu-master Flags
 layout: default
 active_nav: docs
-last_updated: 'Last updated 2018-03-21 12:34:58 CDT'
+last_updated: 'Last updated 2018-06-14 12:04:30 PDT'
 ---
 <!--
 
@@ -1251,7 +1251,7 @@ configuration tasks.</p>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock">advanced,runtime,stable</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">runtime,advanced,stable</p></td>
 </tr>
 </tbody>
 </table>
@@ -1465,6 +1465,35 @@ being changed or removed without notice.</p>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
 <td class="tableblock halign-left valign-top"><p class="tableblock">runtime,advanced</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>&#160;</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="kudu-master_ntp_initial_sync_wait_secs"><a class="link" href="#kudu-master_ntp_initial_sync_wait_secs"><code>--ntp_initial_sync_wait_secs</code></a></h3>
+<div class="paragraph">
+<p>Amount of time in seconds to wait for NTP to synchronize the clock at startup. A value of zero means Kudu will fail to start if the clock is unsynchronized. This flag can prevent Kudu from crashing if it starts before NTP can synchronize the clock.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int32</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>60</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">advanced,evolving</p></td>
 </tr>
 </tbody>
 </table>
@@ -1910,7 +1939,7 @@ being changed or removed without notice.</p>
 <div class="sect2">
 <h3 id="kudu-master_block_manager_max_open_files"><a class="link" href="#kudu-master_block_manager_max_open_files"><code>--block_manager_max_open_files</code></a></h3>
 <div class="paragraph">
-<p>Maximum number of open file descriptors to be used for data blocks. If -1, Kudu will use 40% of its resource limit as per getrlimit(). This is a soft limit. It is an error to use a value of 0.</p>
+<p>Maximum number of open file descriptors to be used for data blocks. If -1, Kudu will automatically calculate this value. This is a soft limit. It is an error to use a value of 0.</p>
 </div>
 <table class="tableblock frame-all grid-all" style="width: 50%;">
 <colgroup>
@@ -2026,7 +2055,7 @@ being changed or removed without notice.</p>
 <div class="sect2">
 <h3 id="kudu-master_block_manager"><a class="link" href="#kudu-master_block_manager"><code>--block_manager</code></a></h3>
 <div class="paragraph">
-<p>Which block manager to use for storage. Only the file block manager is supported for non-Linux systems.</p>
+<p>Which block manager to use for storage. Valid options are 'file' and 'log'.</p>
 </div>
 <table class="tableblock frame-all grid-all" style="width: 50%;">
 <colgroup>
@@ -2040,7 +2069,7 @@ being changed or removed without notice.</p>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>file</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>log</code></p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
@@ -2171,7 +2200,7 @@ being changed or removed without notice.</p>
 <div class="sect2">
 <h3 id="kudu-master_server_thread_pool_max_thread_count"><a class="link" href="#kudu-master_server_thread_pool_max_thread_count"><code>--server_thread_pool_max_thread_count</code></a></h3>
 <div class="paragraph">
-<p>Maximum number of threads to allow in each server-wide thread pool. If -1, Kudu will use 10% of its running thread per effective uid resource limit as per getrlimit(). It is an error to use a value of 0.</p>
+<p>Maximum number of threads to allow in each server-wide thread pool. If -1, Kudu will automatically calculate this value. It is an error to use a value of 0.</p>
 </div>
 <table class="tableblock frame-all grid-all" style="width: 50%;">
 <colgroup>
@@ -2181,7 +2210,7 @@ being changed or removed without notice.</p>
 <tbody>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock">int64</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int32</p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
@@ -2645,7 +2674,7 @@ being changed or removed without notice.</p>
 <tbody>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock">int32</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int64</p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
@@ -2678,7 +2707,7 @@ being changed or removed without notice.</p>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
@@ -3851,6 +3880,35 @@ being changed or removed without notice.</p>
 </div>
 </div>
 <div class="sect2">
+<h3 id="kudu-master_tablet_copy_begin_session_timeout_ms"><a class="link" href="#kudu-master_tablet_copy_begin_session_timeout_ms"><code>--tablet_copy_begin_session_timeout_ms</code></a></h3>
+<div class="paragraph">
+<p>Tablet server RPC client timeout for BeginTabletCopySession calls. Also used for EndTabletCopySession calls.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int32</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>30000</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">advanced</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>&#160;</p>
+</div>
+</div>
+<div class="sect2">
 <h3 id="kudu-master_tablet_copy_idle_timeout_sec"><a class="link" href="#kudu-master_tablet_copy_idle_timeout_sec"><code>--tablet_copy_idle_timeout_sec</code></a></h3>
 <div class="paragraph">
 <p>Amount of time without activity before a tablet copy session will expire, in seconds</p>
@@ -4013,6 +4071,35 @@ being changed or removed without notice.</p>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>10</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">advanced</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>&#160;</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="kudu-master_num_tablets_to_delete_simultaneously"><a class="link" href="#kudu-master_num_tablets_to_delete_simultaneously"><code>--num_tablets_to_delete_simultaneously</code></a></h3>
+<div class="paragraph">
+<p>Number of threads available to delete tablets. If this is set to 0 (the default), then the number of delete threads will be set based on the number of data directories. If the data directories are on some very fast storage device such as SSD or a RAID array, it may make sense to manually tune this.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int32</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0</code></p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
@@ -4273,7 +4360,7 @@ being changed or removed without notice.</p>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
@@ -4489,6 +4576,35 @@ being changed or removed without notice.</p>
 </div>
 </div>
 <div class="sect2">
+<h3 id="kudu-master_drop_log_memory"><a class="link" href="#kudu-master_drop_log_memory"><code>--drop_log_memory</code></a></h3>
+<div class="paragraph">
+<p>Drop in-memory buffers of log contents. Logs can grow very quickly and they are rarely read before they need to be evicted from memory. Instead, drop them from memory as soon as they are flushed to disk.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">bool</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">runtime,advanced</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>&#160;</p>
+</div>
+</div>
+<div class="sect2">
 <h3 id="kudu-master_log_backtrace_at"><a class="link" href="#kudu-master_log_backtrace_at"><code>--log_backtrace_at</code></a></h3>
 <div class="paragraph">
 <p>Emit a backtrace when logging at file:linenum.</p>
@@ -4652,6 +4768,10 @@ being changed or removed without notice.</p>
       <li>
 
           <a href="schema_design.html">Kudu Schema Design</a> 
+      </li> 
+      <li>
+
+          <a href="scaling_guide.html">Kudu Scaling Guide</a> 
       </li> 
       <li>
 

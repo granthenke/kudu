@@ -2,7 +2,7 @@
 title: Apache Kudu Configuration Reference
 layout: default
 active_nav: docs
-last_updated: 'Last updated 2018-03-21 12:34:58 CDT'
+last_updated: 'Last updated 2018-06-14 12:04:30 PDT'
 ---
 <!--
 
@@ -1251,7 +1251,7 @@ configuration tasks.</p>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock">advanced,runtime,stable</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">runtime,advanced,stable</p></td>
 </tr>
 </tbody>
 </table>
@@ -1463,6 +1463,35 @@ being changed or removed without notice.</p>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
 <td class="tableblock halign-left valign-top"><p class="tableblock">runtime,advanced</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>&#160;</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="kudu-master_ntp_initial_sync_wait_secs"><a class="link" href="#kudu-master_ntp_initial_sync_wait_secs"><code>--ntp_initial_sync_wait_secs</code></a></h4>
+<div class="paragraph">
+<p>Amount of time in seconds to wait for NTP to synchronize the clock at startup. A value of zero means Kudu will fail to start if the clock is unsynchronized. This flag can prevent Kudu from crashing if it starts before NTP can synchronize the clock.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int32</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>60</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">advanced,evolving</p></td>
 </tr>
 </tbody>
 </table>
@@ -1908,7 +1937,7 @@ being changed or removed without notice.</p>
 <div class="sect3">
 <h4 id="kudu-master_block_manager_max_open_files"><a class="link" href="#kudu-master_block_manager_max_open_files"><code>--block_manager_max_open_files</code></a></h4>
 <div class="paragraph">
-<p>Maximum number of open file descriptors to be used for data blocks. If -1, Kudu will use 40% of its resource limit as per getrlimit(). This is a soft limit. It is an error to use a value of 0.</p>
+<p>Maximum number of open file descriptors to be used for data blocks. If -1, Kudu will automatically calculate this value. This is a soft limit. It is an error to use a value of 0.</p>
 </div>
 <table class="tableblock frame-all grid-all" style="width: 50%;">
 <colgroup>
@@ -2024,7 +2053,7 @@ being changed or removed without notice.</p>
 <div class="sect3">
 <h4 id="kudu-master_block_manager"><a class="link" href="#kudu-master_block_manager"><code>--block_manager</code></a></h4>
 <div class="paragraph">
-<p>Which block manager to use for storage. Only the file block manager is supported for non-Linux systems.</p>
+<p>Which block manager to use for storage. Valid options are 'file' and 'log'.</p>
 </div>
 <table class="tableblock frame-all grid-all" style="width: 50%;">
 <colgroup>
@@ -2038,7 +2067,7 @@ being changed or removed without notice.</p>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>file</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>log</code></p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
@@ -2169,7 +2198,7 @@ being changed or removed without notice.</p>
 <div class="sect3">
 <h4 id="kudu-master_server_thread_pool_max_thread_count"><a class="link" href="#kudu-master_server_thread_pool_max_thread_count"><code>--server_thread_pool_max_thread_count</code></a></h4>
 <div class="paragraph">
-<p>Maximum number of threads to allow in each server-wide thread pool. If -1, Kudu will use 10% of its running thread per effective uid resource limit as per getrlimit(). It is an error to use a value of 0.</p>
+<p>Maximum number of threads to allow in each server-wide thread pool. If -1, Kudu will automatically calculate this value. It is an error to use a value of 0.</p>
 </div>
 <table class="tableblock frame-all grid-all" style="width: 50%;">
 <colgroup>
@@ -2179,7 +2208,7 @@ being changed or removed without notice.</p>
 <tbody>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock">int64</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int32</p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
@@ -2643,7 +2672,7 @@ being changed or removed without notice.</p>
 <tbody>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock">int32</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int64</p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
@@ -2676,7 +2705,7 @@ being changed or removed without notice.</p>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
@@ -3849,6 +3878,35 @@ being changed or removed without notice.</p>
 </div>
 </div>
 <div class="sect3">
+<h4 id="kudu-master_tablet_copy_begin_session_timeout_ms"><a class="link" href="#kudu-master_tablet_copy_begin_session_timeout_ms"><code>--tablet_copy_begin_session_timeout_ms</code></a></h4>
+<div class="paragraph">
+<p>Tablet server RPC client timeout for BeginTabletCopySession calls. Also used for EndTabletCopySession calls.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int32</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>30000</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">advanced</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>&#160;</p>
+</div>
+</div>
+<div class="sect3">
 <h4 id="kudu-master_tablet_copy_idle_timeout_sec"><a class="link" href="#kudu-master_tablet_copy_idle_timeout_sec"><code>--tablet_copy_idle_timeout_sec</code></a></h4>
 <div class="paragraph">
 <p>Amount of time without activity before a tablet copy session will expire, in seconds</p>
@@ -4011,6 +4069,35 @@ being changed or removed without notice.</p>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>10</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">advanced</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>&#160;</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="kudu-master_num_tablets_to_delete_simultaneously"><a class="link" href="#kudu-master_num_tablets_to_delete_simultaneously"><code>--num_tablets_to_delete_simultaneously</code></a></h4>
+<div class="paragraph">
+<p>Number of threads available to delete tablets. If this is set to 0 (the default), then the number of delete threads will be set based on the number of data directories. If the data directories are on some very fast storage device such as SSD or a RAID array, it may make sense to manually tune this.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int32</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0</code></p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
@@ -4271,7 +4358,7 @@ being changed or removed without notice.</p>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
@@ -4479,6 +4566,35 @@ being changed or removed without notice.</p>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
 <td class="tableblock halign-left valign-top"><p class="tableblock">advanced</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>&#160;</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="kudu-master_drop_log_memory"><a class="link" href="#kudu-master_drop_log_memory"><code>--drop_log_memory</code></a></h4>
+<div class="paragraph">
+<p>Drop in-memory buffers of log contents. Logs can grow very quickly and they are rarely read before they need to be evicted from memory. Instead, drop them from memory as soon as they are flushed to disk.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">bool</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">runtime,advanced</p></td>
 </tr>
 </tbody>
 </table>
@@ -5832,7 +5948,7 @@ configuration tasks.</p>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock">advanced,runtime,stable</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">runtime,advanced,stable</p></td>
 </tr>
 </tbody>
 </table>
@@ -6044,6 +6160,35 @@ being changed or removed without notice.</p>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
 <td class="tableblock halign-left valign-top"><p class="tableblock">runtime,advanced</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>&#160;</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="kudu-tserver_ntp_initial_sync_wait_secs"><a class="link" href="#kudu-tserver_ntp_initial_sync_wait_secs"><code>--ntp_initial_sync_wait_secs</code></a></h4>
+<div class="paragraph">
+<p>Amount of time in seconds to wait for NTP to synchronize the clock at startup. A value of zero means Kudu will fail to start if the clock is unsynchronized. This flag can prevent Kudu from crashing if it starts before NTP can synchronize the clock.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int32</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>60</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">advanced,evolving</p></td>
 </tr>
 </tbody>
 </table>
@@ -6489,7 +6634,7 @@ being changed or removed without notice.</p>
 <div class="sect3">
 <h4 id="kudu-tserver_block_manager_max_open_files"><a class="link" href="#kudu-tserver_block_manager_max_open_files"><code>--block_manager_max_open_files</code></a></h4>
 <div class="paragraph">
-<p>Maximum number of open file descriptors to be used for data blocks. If -1, Kudu will use 40% of its resource limit as per getrlimit(). This is a soft limit. It is an error to use a value of 0.</p>
+<p>Maximum number of open file descriptors to be used for data blocks. If -1, Kudu will automatically calculate this value. This is a soft limit. It is an error to use a value of 0.</p>
 </div>
 <table class="tableblock frame-all grid-all" style="width: 50%;">
 <colgroup>
@@ -6605,7 +6750,7 @@ being changed or removed without notice.</p>
 <div class="sect3">
 <h4 id="kudu-tserver_block_manager"><a class="link" href="#kudu-tserver_block_manager"><code>--block_manager</code></a></h4>
 <div class="paragraph">
-<p>Which block manager to use for storage. Only the file block manager is supported for non-Linux systems.</p>
+<p>Which block manager to use for storage. Valid options are 'file' and 'log'.</p>
 </div>
 <table class="tableblock frame-all grid-all" style="width: 50%;">
 <colgroup>
@@ -6619,7 +6764,7 @@ being changed or removed without notice.</p>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>file</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>log</code></p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
@@ -6750,7 +6895,7 @@ being changed or removed without notice.</p>
 <div class="sect3">
 <h4 id="kudu-tserver_server_thread_pool_max_thread_count"><a class="link" href="#kudu-tserver_server_thread_pool_max_thread_count"><code>--server_thread_pool_max_thread_count</code></a></h4>
 <div class="paragraph">
-<p>Maximum number of threads to allow in each server-wide thread pool. If -1, Kudu will use 10% of its running thread per effective uid resource limit as per getrlimit(). It is an error to use a value of 0.</p>
+<p>Maximum number of threads to allow in each server-wide thread pool. If -1, Kudu will automatically calculate this value. It is an error to use a value of 0.</p>
 </div>
 <table class="tableblock frame-all grid-all" style="width: 50%;">
 <colgroup>
@@ -6760,7 +6905,7 @@ being changed or removed without notice.</p>
 <tbody>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock">int64</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int32</p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
@@ -7021,7 +7166,7 @@ being changed or removed without notice.</p>
 <tbody>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock">int32</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int64</p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
@@ -7054,7 +7199,7 @@ being changed or removed without notice.</p>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
@@ -8227,6 +8372,35 @@ being changed or removed without notice.</p>
 </div>
 </div>
 <div class="sect3">
+<h4 id="kudu-tserver_tablet_copy_begin_session_timeout_ms"><a class="link" href="#kudu-tserver_tablet_copy_begin_session_timeout_ms"><code>--tablet_copy_begin_session_timeout_ms</code></a></h4>
+<div class="paragraph">
+<p>Tablet server RPC client timeout for BeginTabletCopySession calls. Also used for EndTabletCopySession calls.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int32</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>30000</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">advanced</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>&#160;</p>
+</div>
+</div>
+<div class="sect3">
 <h4 id="kudu-tserver_tablet_copy_idle_timeout_sec"><a class="link" href="#kudu-tserver_tablet_copy_idle_timeout_sec"><code>--tablet_copy_idle_timeout_sec</code></a></h4>
 <div class="paragraph">
 <p>Amount of time without activity before a tablet copy session will expire, in seconds</p>
@@ -8389,6 +8563,35 @@ being changed or removed without notice.</p>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>10</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">advanced</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>&#160;</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="kudu-tserver_num_tablets_to_delete_simultaneously"><a class="link" href="#kudu-tserver_num_tablets_to_delete_simultaneously"><code>--num_tablets_to_delete_simultaneously</code></a></h4>
+<div class="paragraph">
+<p>Number of threads available to delete tablets. If this is set to 0 (the default), then the number of delete threads will be set based on the number of data directories. If the data directories are on some very fast storage device such as SSD or a RAID array, it may make sense to manually tune this.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int32</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0</code></p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
@@ -8649,7 +8852,7 @@ being changed or removed without notice.</p>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
@@ -8857,6 +9060,35 @@ being changed or removed without notice.</p>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
 <td class="tableblock halign-left valign-top"><p class="tableblock">advanced</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>&#160;</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="kudu-tserver_drop_log_memory"><a class="link" href="#kudu-tserver_drop_log_memory"><code>--drop_log_memory</code></a></h4>
+<div class="paragraph">
+<p>Drop in-memory buffers of log contents. Logs can grow very quickly and they are rarely read before they need to be evicted from memory. Instead, drop them from memory as soon as they are flushed to disk.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">bool</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">runtime,advanced</p></td>
 </tr>
 </tbody>
 </table>
@@ -9868,7 +10100,7 @@ subject to being changed or removed without notice.</p>
 <div class="sect3">
 <h4 id="kudu-master_block_manager"><a class="link" href="#kudu-master_block_manager"><code>--block_manager</code></a></h4>
 <div class="paragraph">
-<p>Which block manager to use for storage. Only the file block manager is supported for non-Linux systems.</p>
+<p>Which block manager to use for storage. Valid options are 'file' and 'log'.</p>
 </div>
 <table class="tableblock frame-all grid-all" style="width: 50%;">
 <colgroup>
@@ -9882,7 +10114,7 @@ subject to being changed or removed without notice.</p>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>file</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>log</code></p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
@@ -10017,6 +10249,188 @@ subject to being changed or removed without notice.</p>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
 <td class="tableblock halign-left valign-top"><p class="tableblock">advanced</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="kudu-master_hive_metastore_conn_timeout"><a class="link" href="#kudu-master_hive_metastore_conn_timeout"><code>--hive_metastore_conn_timeout</code></a></h4>
+<div class="paragraph">
+<p>Configures the socket connect timeout, in seconds, for Thrift connections to the Hive Metastore.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int32</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>60</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">runtime,experimental,advanced</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="kudu-master_hive_metastore_recv_timeout"><a class="link" href="#kudu-master_hive_metastore_recv_timeout"><code>--hive_metastore_recv_timeout</code></a></h4>
+<div class="paragraph">
+<p>Configures the socket receive timeout, in seconds, for Thrift connections to the Hive Metastore.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int32</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>60</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">runtime,experimental,advanced</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="kudu-master_hive_metastore_retry_count"><a class="link" href="#kudu-master_hive_metastore_retry_count"><code>--hive_metastore_retry_count</code></a></h4>
+<div class="paragraph">
+<p>The number of times that HMS operations will retry after encountering retriable failures, such as network errors.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int32</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>1</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">runtime,experimental,advanced</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="kudu-master_hive_metastore_sasl_enabled"><a class="link" href="#kudu-master_hive_metastore_sasl_enabled"><code>--hive_metastore_sasl_enabled</code></a></h4>
+<div class="paragraph">
+<p>Configures whether Thrift connections to the Hive Metastore use SASL (Kerberos) security. Must match the value of the hive.metastore.sasl.enabled option in the Hive Metastore configuration. When enabled, the --keytab_file flag must be provided.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">bool</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">experimental</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="kudu-master_hive_metastore_send_timeout"><a class="link" href="#kudu-master_hive_metastore_send_timeout"><code>--hive_metastore_send_timeout</code></a></h4>
+<div class="paragraph">
+<p>Configures the socket send timeout, in seconds, for Thrift connections to the Hive Metastore.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int32</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>60</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">runtime,experimental,advanced</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="kudu-master_hive_metastore_uris"><a class="link" href="#kudu-master_hive_metastore_uris"><code>--hive_metastore_uris</code></a></h4>
+<div class="paragraph">
+<p>Address of the Hive Metastore instance(s). The provided port must be for the HMS Thrift service. If a port isn&#8217;t provided, defaults to 9083. If the HMS is deployed in an HA configuration, multiple comma-separated addresses can be supplied. If not set, the Kudu master will not send Kudu table catalog updates to Hive. The configured value must match the Hive hive.metastore.uris configuration.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">none</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">experimental</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="kudu-master_hms_client_max_buf_size"><a class="link" href="#kudu-master_hms_client_max_buf_size"><code>--hms_client_max_buf_size</code></a></h4>
+<div class="paragraph">
+<p>Maximum size of Hive Metastore objects that can be received by the HMS client in bytes.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int32</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>104857600</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">runtime,experimental</p></td>
 </tr>
 </tbody>
 </table>
@@ -10606,7 +11020,7 @@ subject to being changed or removed without notice.</p>
 <tbody>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock">int32</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int64</p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
@@ -10636,7 +11050,7 @@ subject to being changed or removed without notice.</p>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
@@ -10726,7 +11140,7 @@ subject to being changed or removed without notice.</p>
 <div class="sect3">
 <h4 id="kudu-master_diagnostics_log_stack_traces_interval_ms"><a class="link" href="#kudu-master_diagnostics_log_stack_traces_interval_ms"><code>--diagnostics_log_stack_traces_interval_ms</code></a></h4>
 <div class="paragraph">
-<p>The interval at which the server will a snapshot of its thread stacks to the diagnostics log. In fact, the server will log at a random interval betweeen zero and twice the configured value to avoid biasing samples towards periodic processes which happen exactly on some particular schedule. If this is set to 0, stack traces will be not be periodically logged.</p>
+<p>The interval at which the server will a snapshot of its thread stacks to the diagnostics log. In fact, the server will log at a random interval betweeen zero and twice the configured value to avoid biasing samples towards periodic processes which happen exactly on some particular schedule. If this is set to 0, stack traces will be not be periodically logged, but will still be logged on events such as queue overflows. Setting this to a negative value disables stack trace logging entirely.</p>
 </div>
 <table class="tableblock frame-all grid-all" style="width: 50%;">
 <colgroup>
@@ -10736,7 +11150,7 @@ subject to being changed or removed without notice.</p>
 <tbody>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock">uint32</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int32</p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
@@ -10823,6 +11237,32 @@ subject to being changed or removed without notice.</p>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
 <td class="tableblock halign-left valign-top"><p class="tableblock">advanced</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="kudu-master_rpc_reuseport"><a class="link" href="#kudu-master_rpc_reuseport"><code>--rpc_reuseport</code></a></h4>
+<div class="paragraph">
+<p>Whether to set the SO_REUSEPORT option on listening RPC sockets.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">bool</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">experimental</p></td>
 </tr>
 </tbody>
 </table>
@@ -11634,6 +12074,32 @@ subject to being changed or removed without notice.</p>
 </table>
 </div>
 <div class="sect3">
+<h4 id="kudu-master_rowset_metadata_store_keys"><a class="link" href="#kudu-master_rowset_metadata_store_keys"><code>--rowset_metadata_store_keys</code></a></h4>
+<div class="paragraph">
+<p>Whether to store the min/max encoded keys in the rowset metadata. If false, keys will be read from the data blocks.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">bool</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">experimental</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
 <h4 id="kudu-master_tablet_delta_store_major_compact_min_ratio"><a class="link" href="#kudu-master_tablet_delta_store_major_compact_min_ratio"><code>--tablet_delta_store_major_compact_min_ratio</code></a></h4>
 <div class="paragraph">
 <p>Minimum ratio of sizeof(deltas) to sizeof(base data) before a major compaction can run (Advanced option)</p>
@@ -12102,6 +12568,32 @@ subject to being changed or removed without notice.</p>
 </table>
 </div>
 <div class="sect3">
+<h4 id="kudu-master_tablet_copy_begin_session_timeout_ms"><a class="link" href="#kudu-master_tablet_copy_begin_session_timeout_ms"><code>--tablet_copy_begin_session_timeout_ms</code></a></h4>
+<div class="paragraph">
+<p>Tablet server RPC client timeout for BeginTabletCopySession calls. Also used for EndTabletCopySession calls.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int32</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>30000</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">advanced</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
 <h4 id="kudu-master_scanner_batch_size_rows"><a class="link" href="#kudu-master_scanner_batch_size_rows"><code>--scanner_batch_size_rows</code></a></h4>
 <div class="paragraph">
 <p>The number of rows to batch for servicing scan requests.</p>
@@ -12223,6 +12715,32 @@ subject to being changed or removed without notice.</p>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>10</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">advanced</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="kudu-master_num_tablets_to_delete_simultaneously"><a class="link" href="#kudu-master_num_tablets_to_delete_simultaneously"><code>--num_tablets_to_delete_simultaneously</code></a></h4>
+<div class="paragraph">
+<p>Number of threads available to delete tablets. If this is set to 0 (the default), then the number of delete threads will be set based on the number of data directories. If the data directories are on some very fast storage device such as SSD or a RAID array, it may make sense to manually tune this.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int32</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0</code></p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
@@ -12596,6 +13114,58 @@ subject to being changed or removed without notice.</p>
 </table>
 </div>
 <div class="sect3">
+<h4 id="kudu-master_nvm_cache_allocation_retry_count"><a class="link" href="#kudu-master_nvm_cache_allocation_retry_count"><code>--nvm_cache_allocation_retry_count</code></a></h4>
+<div class="paragraph">
+<p>The number of times that the NVM cache will retry attempts to allocate memory for new entries. In between attempts, a cache entry will be evicted.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int32</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">experimental,advanced</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="kudu-master_nvm_cache_path"><a class="link" href="#kudu-master_nvm_cache_path"><code>--nvm_cache_path</code></a></h4>
+<div class="paragraph">
+<p>The path at which the NVM cache will try to allocate its memory. This can be a tmpfs or ramfs for testing purposes.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/vmem</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">experimental</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
 <h4 id="kudu-master_memory_limit_soft_percentage"><a class="link" href="#kudu-master_memory_limit_soft_percentage"><code>--memory_limit_soft_percentage</code></a></h4>
 <div class="paragraph">
 <p>Percentage of the hard memory limit that this daemon may consume before memory throttling of writes begins. The greater the excess, the higher the chance of throttling. In general, a lower soft limit leads to smoother write latencies but decreased throughput, and vice versa for a higher soft limit.</p>
@@ -12695,6 +13265,32 @@ subject to being changed or removed without notice.</p>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
 <td class="tableblock halign-left valign-top"><p class="tableblock">advanced</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="kudu-master_drop_log_memory"><a class="link" href="#kudu-master_drop_log_memory"><code>--drop_log_memory</code></a></h4>
+<div class="paragraph">
+<p>Drop in-memory buffers of log contents. Logs can grow very quickly and they are rarely read before they need to be evicted from memory. Instead, drop them from memory as soon as they are flushed to disk.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">bool</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">runtime,advanced</p></td>
 </tr>
 </tbody>
 </table>
@@ -13673,7 +14269,7 @@ subject to being changed or removed without notice.</p>
 <div class="sect3">
 <h4 id="kudu-tserver_block_manager"><a class="link" href="#kudu-tserver_block_manager"><code>--block_manager</code></a></h4>
 <div class="paragraph">
-<p>Which block manager to use for storage. Only the file block manager is supported for non-Linux systems.</p>
+<p>Which block manager to use for storage. Valid options are 'file' and 'log'.</p>
 </div>
 <table class="tableblock frame-all grid-all" style="width: 50%;">
 <colgroup>
@@ -13687,7 +14283,7 @@ subject to being changed or removed without notice.</p>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>file</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>log</code></p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
@@ -14047,7 +14643,7 @@ subject to being changed or removed without notice.</p>
 <tbody>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock">int32</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int64</p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
@@ -14077,7 +14673,7 @@ subject to being changed or removed without notice.</p>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
@@ -14141,7 +14737,7 @@ subject to being changed or removed without notice.</p>
 <div class="sect3">
 <h4 id="kudu-tserver_diagnostics_log_stack_traces_interval_ms"><a class="link" href="#kudu-tserver_diagnostics_log_stack_traces_interval_ms"><code>--diagnostics_log_stack_traces_interval_ms</code></a></h4>
 <div class="paragraph">
-<p>The interval at which the server will a snapshot of its thread stacks to the diagnostics log. In fact, the server will log at a random interval betweeen zero and twice the configured value to avoid biasing samples towards periodic processes which happen exactly on some particular schedule. If this is set to 0, stack traces will be not be periodically logged.</p>
+<p>The interval at which the server will a snapshot of its thread stacks to the diagnostics log. In fact, the server will log at a random interval betweeen zero and twice the configured value to avoid biasing samples towards periodic processes which happen exactly on some particular schedule. If this is set to 0, stack traces will be not be periodically logged, but will still be logged on events such as queue overflows. Setting this to a negative value disables stack trace logging entirely.</p>
 </div>
 <table class="tableblock frame-all grid-all" style="width: 50%;">
 <colgroup>
@@ -14151,7 +14747,7 @@ subject to being changed or removed without notice.</p>
 <tbody>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock">uint32</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int32</p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
@@ -14238,6 +14834,32 @@ subject to being changed or removed without notice.</p>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
 <td class="tableblock halign-left valign-top"><p class="tableblock">advanced</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="kudu-tserver_rpc_reuseport"><a class="link" href="#kudu-tserver_rpc_reuseport"><code>--rpc_reuseport</code></a></h4>
+<div class="paragraph">
+<p>Whether to set the SO_REUSEPORT option on listening RPC sockets.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">bool</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">experimental</p></td>
 </tr>
 </tbody>
 </table>
@@ -15049,6 +15671,32 @@ subject to being changed or removed without notice.</p>
 </table>
 </div>
 <div class="sect3">
+<h4 id="kudu-tserver_rowset_metadata_store_keys"><a class="link" href="#kudu-tserver_rowset_metadata_store_keys"><code>--rowset_metadata_store_keys</code></a></h4>
+<div class="paragraph">
+<p>Whether to store the min/max encoded keys in the rowset metadata. If false, keys will be read from the data blocks.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">bool</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">experimental</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
 <h4 id="kudu-tserver_tablet_delta_store_major_compact_min_ratio"><a class="link" href="#kudu-tserver_tablet_delta_store_major_compact_min_ratio"><code>--tablet_delta_store_major_compact_min_ratio</code></a></h4>
 <div class="paragraph">
 <p>Minimum ratio of sizeof(deltas) to sizeof(base data) before a major compaction can run (Advanced option)</p>
@@ -15517,6 +16165,32 @@ subject to being changed or removed without notice.</p>
 </table>
 </div>
 <div class="sect3">
+<h4 id="kudu-tserver_tablet_copy_begin_session_timeout_ms"><a class="link" href="#kudu-tserver_tablet_copy_begin_session_timeout_ms"><code>--tablet_copy_begin_session_timeout_ms</code></a></h4>
+<div class="paragraph">
+<p>Tablet server RPC client timeout for BeginTabletCopySession calls. Also used for EndTabletCopySession calls.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int32</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>30000</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">advanced</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
 <h4 id="kudu-tserver_scanner_batch_size_rows"><a class="link" href="#kudu-tserver_scanner_batch_size_rows"><code>--scanner_batch_size_rows</code></a></h4>
 <div class="paragraph">
 <p>The number of rows to batch for servicing scan requests.</p>
@@ -15638,6 +16312,32 @@ subject to being changed or removed without notice.</p>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>10</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">advanced</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="kudu-tserver_num_tablets_to_delete_simultaneously"><a class="link" href="#kudu-tserver_num_tablets_to_delete_simultaneously"><code>--num_tablets_to_delete_simultaneously</code></a></h4>
+<div class="paragraph">
+<p>Number of threads available to delete tablets. If this is set to 0 (the default), then the number of delete threads will be set based on the number of data directories. If the data directories are on some very fast storage device such as SSD or a RAID array, it may make sense to manually tune this.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int32</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0</code></p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
@@ -16011,6 +16711,58 @@ subject to being changed or removed without notice.</p>
 </table>
 </div>
 <div class="sect3">
+<h4 id="kudu-tserver_nvm_cache_allocation_retry_count"><a class="link" href="#kudu-tserver_nvm_cache_allocation_retry_count"><code>--nvm_cache_allocation_retry_count</code></a></h4>
+<div class="paragraph">
+<p>The number of times that the NVM cache will retry attempts to allocate memory for new entries. In between attempts, a cache entry will be evicted.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int32</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">experimental,advanced</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="kudu-tserver_nvm_cache_path"><a class="link" href="#kudu-tserver_nvm_cache_path"><code>--nvm_cache_path</code></a></h4>
+<div class="paragraph">
+<p>The path at which the NVM cache will try to allocate its memory. This can be a tmpfs or ramfs for testing purposes.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/vmem</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">experimental</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
 <h4 id="kudu-tserver_memory_limit_soft_percentage"><a class="link" href="#kudu-tserver_memory_limit_soft_percentage"><code>--memory_limit_soft_percentage</code></a></h4>
 <div class="paragraph">
 <p>Percentage of the hard memory limit that this daemon may consume before memory throttling of writes begins. The greater the excess, the higher the chance of throttling. In general, a lower soft limit leads to smoother write latencies but decreased throughput, and vice versa for a higher soft limit.</p>
@@ -16110,6 +16862,32 @@ subject to being changed or removed without notice.</p>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
 <td class="tableblock halign-left valign-top"><p class="tableblock">advanced</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="kudu-tserver_drop_log_memory"><a class="link" href="#kudu-tserver_drop_log_memory"><code>--drop_log_memory</code></a></h4>
+<div class="paragraph">
+<p>Drop in-memory buffers of log contents. Logs can grow very quickly and they are rarely read before they need to be evicted from memory. Instead, drop them from memory as soon as they are flushed to disk.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">bool</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">runtime,advanced</p></td>
 </tr>
 </tbody>
 </table>
@@ -16267,6 +17045,10 @@ subject to being changed or removed without notice.</p>
       <li>
 
           <a href="schema_design.html">Kudu Schema Design</a> 
+      </li> 
+      <li>
+
+          <a href="scaling_guide.html">Kudu Scaling Guide</a> 
       </li> 
       <li>
 
