@@ -2,7 +2,7 @@
 title: kudu-master Unsupported Flags
 layout: default
 active_nav: docs
-last_updated: 'Last updated 2018-06-14 12:04:30 PDT'
+last_updated: 'Last updated 2018-06-18 07:37:43 PDT'
 ---
 <!--
 
@@ -962,7 +962,7 @@ subject to being changed or removed without notice.</p>
 <h2 id="kudu-master_block_manager"><a class="link" href="#kudu-master_block_manager"><code>--block_manager</code></a></h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Which block manager to use for storage. Only the file block manager is supported for non-Linux systems.</p>
+<p>Which block manager to use for storage. Valid options are 'file' and 'log'.</p>
 </div>
 <table class="tableblock frame-all grid-all" style="width: 50%;">
 <colgroup>
@@ -976,7 +976,7 @@ subject to being changed or removed without notice.</p>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>file</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>log</code></p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
@@ -1788,7 +1788,7 @@ subject to being changed or removed without notice.</p>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
@@ -3899,6 +3899,62 @@ subject to being changed or removed without notice.</p>
 </div>
 </div>
 <div class="sect1">
+<h2 id="kudu-master_nvm_cache_allocation_retry_count"><a class="link" href="#kudu-master_nvm_cache_allocation_retry_count"><code>--nvm_cache_allocation_retry_count</code></a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The number of times that the NVM cache will retry attempts to allocate memory for new entries. In between attempts, a cache entry will be evicted.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int32</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">experimental,advanced</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="kudu-master_nvm_cache_path"><a class="link" href="#kudu-master_nvm_cache_path"><code>--nvm_cache_path</code></a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The path at which the NVM cache will try to allocate its memory. This can be a tmpfs or ramfs for testing purposes.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/vmem</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">experimental</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
 <h2 id="kudu-master_memory_limit_soft_percentage"><a class="link" href="#kudu-master_memory_limit_soft_percentage"><code>--memory_limit_soft_percentage</code></a></h2>
 <div class="sectionbody">
 <div class="paragraph">
@@ -4005,6 +4061,34 @@ subject to being changed or removed without notice.</p>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
 <td class="tableblock halign-left valign-top"><p class="tableblock">advanced</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="kudu-master_drop_log_memory"><a class="link" href="#kudu-master_drop_log_memory"><code>--drop_log_memory</code></a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Drop in-memory buffers of log contents. Logs can grow very quickly and they are rarely read before they need to be evicted from memory. Instead, drop them from memory as soon as they are flushed to disk.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 50%;">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Type</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">bool</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Default</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Tags</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">runtime,advanced</p></td>
 </tr>
 </tbody>
 </table>
@@ -4168,10 +4252,6 @@ subject to being changed or removed without notice.</p>
       <li>
 
           <a href="schema_design.html">Kudu Schema Design</a> 
-      </li> 
-      <li>
-
-          <a href="scaling_guide.html">Kudu Scaling Guide</a> 
       </li> 
       <li>
 

@@ -1,8 +1,8 @@
 ---
-title: Apache Kudu 1.7.0 Release Notes
+title: Apache Kudu 1.7.1 Release Notes
 layout: default
 active_nav: docs
-last_updated: 'Last updated 2018-03-19 08:09:15 CDT'
+last_updated: 'Last updated 2018-06-15 07:22:05 PDT'
 ---
 <!--
 
@@ -24,8 +24,72 @@ limitations under the License.
   <div class="row">
     <div class="col-md-9">
 
-<h1>Apache Kudu 1.7.0 Release Notes</h1>
+<h1>Apache Kudu 1.7.1 Release Notes</h1>
       <div class="sect1">
+<h2 id="rn_1.7.1_fixed_issues"><a class="link" href="#rn_1.7.1_fixed_issues">Fixed Issues</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Apache Kudu 1.7.1 is a bug-fix release which fixes critical issues in Kudu 1.7.0.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Fixed and issue where a leader replica could report a follower&#8217;s health status
+as FAILED instead of FAILED_UNRECOVERABLE. In configurations where the tablet
+replication factor equals to the total number of tablet servers in the cluster,
+that lead to situations where the tablet could not be automatically recovered
+until a new leader was elected or corresponding tablet servers were restarted.
+(see <a href="https://issues.apache.org/jira/browse/KUDU-2367">KUDU-2367</a>).</p>
+</li>
+<li>
+<p>Fixed an issue where Kudu would fail to start if RLIMIT_NPROC was set to -1.
+(see <a href="https://issues.apache.org/jira/browse/KUDU-2377">KUDU-2377</a>).</p>
+</li>
+<li>
+<p>Fixed an issue where <code>kudu-spark</code> was unable to connect to secure clusters.
+(see <a href="https://issues.apache.org/jira/browse/KUDU-2379">KUDU-2379</a>).</p>
+</li>
+<li>
+<p>Fixed an issue where the <code>kudu-python</code> client would not compile in environments
+where <code>__int128</code> is not supported. This was most commonly el6 environments.
+(see <a href="https://issues.apache.org/jira/browse/KUDU-2412">KUDU-2412</a>).</p>
+</li>
+<li>
+<p>Fixed an issue where unaligned loads of <code>__int128</code> integers could result
+in a crash.
+(see <a href="https://issues.apache.org/jira/browse/KUDU-2378">KUDU-2378</a>).</p>
+</li>
+<li>
+<p>Fixed a bug in <code>PartialRow.setMin</code> that could lead to incorrect partition
+pruning when a <code>decimal</code> column is part of the tables range partition but
+not a part of the query predicate.
+(see <a href="https://issues.apache.org/jira/browse/KUDU-2416">KUDU-2416</a>).</p>
+</li>
+<li>
+<p>Fixed an equality check on <code>decimal</code> column predicates that could result
+in pruning that is too conservative.</p>
+</li>
+<li>
+<p>Fixed an issue where ColumnSchema.toString() would throw a
+NullPointerException on non-decimal types.</p>
+</li>
+<li>
+<p>Added an optimization that improves the performance when scanning tables
+with large consecutive runs of deleted rows. For example, users may use
+'DELETE' all rows in a table or partition before re-adding them, or they
+may delete all data corresponding to some prefix of the PK.</p>
+</li>
+<li>
+<p>Fixed an issue where moving single-replica tablets via
+<code>kudu tablet change_config move_replica</code> does not work.
+(see <a href="https://issues.apache.org/jira/browse/KUDU-2443">KUDU-2443</a>).</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<h1 id="rn_1.7.0_release_notes" class="sect0"><a class="link" href="#rn_1.7.0_release_notes">Apache Kudu 1.7.0 Release Notes</a></h1>
+<div class="sect1">
 <h2 id="rn_1.7.0_upgrade_notes"><a class="link" href="#rn_1.7.0_upgrade_notes">Upgrade Notes</a></h2>
 <div class="sectionbody">
 <div class="ulist">
@@ -503,6 +567,9 @@ contributors, Clemens Valiente and Tsuyoshi Ozawa.</p>
       <li>
 <span class="active-toc">Kudu Release Notes</span>
             <ul class="sectlevel1">
+<li><a href="#rn_1.7.1_fixed_issues">Fixed Issues</a></li>
+<li><a href="#rn_1.7.0_release_notes">Apache Kudu 1.7.0 Release Notes</a>
+<ul class="sectlevel1">
 <li><a href="#rn_1.7.0_upgrade_notes">Upgrade Notes</a></li>
 <li><a href="#rn_1.7.0_obsoletions">Obsoletions</a></li>
 <li><a href="#rn_1.7.0_deprecations">Deprecations</a></li>
@@ -520,6 +587,8 @@ contributors, Clemens Valiente and Tsuyoshi Ozawa.</p>
 <li><a href="#resources_and_next_steps">Resources</a></li>
 <li><a href="#_installation_options">Installation Options</a></li>
 <li><a href="#_next_steps">Next Steps</a></li>
+</ul>
+</li>
 </ul> 
       </li> 
       <li>
