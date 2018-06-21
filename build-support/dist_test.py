@@ -42,7 +42,7 @@ import time
 from kudu_util import init_logging
 
 TEST_TIMEOUT_SECS = int(os.environ.get('TEST_TIMEOUT_SECS', '900'))
-ARTIFACT_ARCHIVE_GLOBS = ["build/*/test-logs/**/*"]
+ARTIFACT_ARCHIVE_GLOBS = ["build/test-logs/**/*"]
 ISOLATE_SERVER = os.environ.get('ISOLATE_SERVER',
                                 "http://isolate.cloudera.org:4242/")
 DIST_TEST_HOME = os.environ.get('DIST_TEST_HOME',
@@ -213,6 +213,20 @@ def is_lib_blacklisted(lib):
   return False
 
 
+def get_base_deps():
+  deps = []
+  for d in DEPS_FOR_ALL:
+    d = os.path.realpath(rel_to_abs(d))
+    if os.path.isdir(d):
+      d += "/"
+    deps.append(d)
+    # DEPS_FOR_ALL may include binaries whose dependencies are not dependencies
+    # of the test executable. We must include those dependencies in the archive
+    # for the binaries to be usable.
+    deps.extend(ldd_deps(d))
+  return deps
+
+
 def is_outside_of_tree(path):
   repo_dir = rel_to_abs("./")
   rel = os.path.relpath(path, repo_dir)
@@ -299,15 +313,7 @@ def create_archive_input(staging, execution,
   files = []
   files.append(rel_test_exe)
   deps = ldd_deps(abs_test_exe)
-  for d in DEPS_FOR_ALL:
-    d = os.path.realpath(rel_to_abs(d))
-    if os.path.isdir(d):
-      d += "/"
-    deps.append(d)
-    # DEPS_FOR_ALL may include binaries whose dependencies are not dependencies
-    # of the test executable. We must include those dependencies in the archive
-    # for the binaries to be usable.
-    deps.extend(ldd_deps(d))
+  deps.extend(get_base_deps())
 
   # Deduplicate dependencies included via DEPS_FOR_ALL.
   for d in set(deps):
@@ -522,6 +528,53 @@ def add_loop_test_subparser(subparsers):
   p.set_defaults(func=loop_test)
 
 
+def run_java_tests(parser, options):
+  subprocess.check_call([rel_to_abs("java/gradlew"), "distTest"],
+      cwd=rel_to_abs("java"))
+  staging = StagingDir(rel_to_abs("java/build/dist-test"))
+  run_isolate(staging)
+  create_task_json(staging, 1)
+  submit_tasks(staging, options)
+
+def loop_java_test(parser, options):
+  """
+  Runs many instances of a user-provided Java test case on the testing service.
+  """
+  if options.num_instances < 1:
+    parser.error("--num-instances must be >= 1")
+  subprocess.check_call(
+      [rel_to_abs("java/gradlew"), "distTest", "--classes", "**/%s" % options.pattern],
+      cwd=rel_to_abs("java"))
+  staging = StagingDir(rel_to_abs("java/build/dist-test"))
+  run_isolate(staging)
+  create_task_json(staging, options.num_instances)
+  submit_tasks(staging, options)
+
+
+def add_java_subparser(subparsers):
+  p = subparsers.add_parser('java', help='Run java tests via dist-test');
+  sp = p.add_subparsers()
+  run_all = sp.add_parser("run-all",
+      help="Run all of the Java tests via dist-test")
+  run_all.set_defaults(func=run_java_tests)
+
+  loop = sp.add_parser("loop", help="Loop a single Java test")
+  loop.add_argument("--num-instances", "-n", dest="num_instances", type=int,
+                 help="number of test instances to start", metavar="NUM",
+                 default=100)
+  loop.add_argument("pattern", help="Pattern matching a Java test to run")
+  loop.set_defaults(func=loop_java_test)
+
+
+def dump_base_deps(parser, options):
+  print json.dumps(get_base_deps())
+
+
+def add_internal_commands(subparsers):
+  p = subparsers.add_parser('internal', help="[Internal commands not for users]")
+  p.add_subparsers().add_parser('dump_base_deps').set_defaults(func=dump_base_deps)
+
+
 def main(argv):
   p = argparse.ArgumentParser()
   p.add_argument("--collect-tmpdir", dest="collect_tmpdir", action="store_true",
@@ -531,6 +584,8 @@ def main(argv):
   sp = p.add_subparsers()
   add_loop_test_subparser(sp)
   add_run_subparser(sp)
+  add_java_subparser(sp)
+  add_internal_commands(sp)
   args = p.parse_args(argv)
   args.func(p, args)
 

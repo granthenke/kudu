@@ -14,6 +14,7 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+import org.apache.kudu.gradle.DistTestTask
 
 // This file is the entry-point for the gradle build and contains
 // common logic for the various subprojects in the build.
@@ -66,4 +67,19 @@ task javadocAggregate(type: Javadoc, group: "Documentation") {
   source subprojects.collect { it.sourceSets.main.allJava }
   classpath = files(subprojects.collect { it.sourceSets.main.compileClasspath })
   destinationDir = file("${buildDir}/docs/javadoc")
+}
+
+task copyJars(type: Copy) {
+  into "$buildDir/jars/"
+  from subprojects.collect {
+    it.configurations.testRuntime
+  }
+}
+
+task distTest(type: DistTestTask, dependsOn: copyJars) {
+  subprojects.each {
+    it.tasks.withType(Test).each {
+      testTask it
+    }
+  }
 }
