@@ -56,7 +56,9 @@ Status KuduTableAlterer::Data::ToRequest(AlterTableRequestPB* req) {
     return status_;
   }
 
-  if (!rename_to_.is_initialized() && steps_.empty()) {
+  if (!rename_to_.is_initialized() &&
+      !owner_.is_initialized() &&
+      steps_.empty()) {
     return Status::InvalidArgument("No alter steps provided");
   }
 
@@ -65,6 +67,9 @@ Status KuduTableAlterer::Data::ToRequest(AlterTableRequestPB* req) {
   req->mutable_table()->set_table_name(table_name_);
   if (rename_to_.is_initialized()) {
     req->set_new_table_name(rename_to_.get());
+  }
+  if (owner_.is_initialized()) {
+    req->set_new_table_owner(owner_.get());
   }
 
   if (schema_ != nullptr) {

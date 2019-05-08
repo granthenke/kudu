@@ -1409,6 +1409,14 @@ Status CatalogManager::CreateTable(const CreateTableRequestPB* orig_req,
   LOG(INFO) << Substitute("Servicing CreateTable request from $0:\n$1",
                           RequestorString(rpc), SecureDebugString(req));
 
+  optional<const string&> user = rpc ?
+      make_optional<const string&>(rpc->remote_user().username()) : none;
+  // Default the owner if it isn't set.
+  if (user) {
+      const string& owner = req.has_owner() ? req.owner() : user.get();
+      req.set_owner(owner);
+  }
+
   // Do some fix-up of any defaults specified on columns.
   // Clients are only expected to pass the default value in the 'read_default'
   // field, but we need to write the schema to disk including the default
@@ -1422,10 +1430,8 @@ Status CatalogManager::CreateTable(const CreateTableRequestPB* orig_req,
   // a. Validate the user request.
   const string& normalized_table_name = NormalizeTableName(req.name());
   if (rpc) {
-    const string& user = rpc->remote_user().username();
-    const string& owner = req.has_owner() ? req.owner() : user;
     RETURN_NOT_OK(SetupError(
-        authz_provider_->AuthorizeCreateTable(normalized_table_name, user, owner),
+        authz_provider_->AuthorizeCreateTable(normalized_table_name, user.get(), req.owner()),
         resp, MasterErrorPB::NOT_AUTHORIZED));
   }
 
@@ -1645,8 +1651,7 @@ Status CatalogManager::CreateTable(const CreateTableRequestPB* orig_req,
   // since this step validates that the table name is available in the HMS catalog.
   if (hms_catalog_) {
     CHECK(rpc);
-    const string& owner = req.has_owner() ? req.owner() : rpc->remote_user().username();
-    Status s = hms_catalog_->CreateTable(table->id(), normalized_table_name, owner, schema);
+    Status s = hms_catalog_->CreateTable(table->id(), normalized_table_name, req.owner(), schema);
     if (!s.ok()) {
       s = s.CloneAndPrepend(Substitute("an error occurred while creating table $0 in the HMS",
                                        normalized_table_name));
@@ -1760,6 +1765,9 @@ scoped_refptr<TableInfo> CatalogManager::CreateTableInfo(const CreateTableReques
   CHECK_OK(SchemaToPB(schema, metadata->mutable_schema()));
   partition_schema.ToPB(metadata->mutable_partition_schema());
   metadata->set_create_timestamp(time(nullptr));
+  if (req.has_owner()) {
+    metadata->set_owner(req.owner());
+  }
   return table;
 }
 
@@ -2323,6 +2331,7 @@ Status CatalogManager::AlterTableRpc(const AlterTableRequestPB& req,
   // in the HMS and wait for the notification log listener to apply
   // that event to the catalog. By 'serializing' the rename through the
   // HMS, race conditions are avoided.
+  // TODO: Mirror owner back to HMS here with tablename.
   if (hms_catalog_ && req.has_new_table_name() && req.modify_external_catalogs()) {
     // Look up the table, lock it and then check that the user is authorized
     // to operate on the table.
@@ -2388,15 +2397,21 @@ Status CatalogManager::AlterTableRpc(const AlterTableRequestPB& req,
   return AlterTable(req, resp, /*hms_notification_log_event_id=*/ none, user);
 }
 
-Status CatalogManager::RenameTableHms(const string& table_id,
-                                      const string& table_name,
-                                      const string& new_table_name,
-                                      int64_t notification_log_event_id) {
+Status CatalogManager::AlterTableHms(const string& table_id,
+                                     const string& table_name,
+                                     optional<const string&> new_table_name,
+                                     optional<const string&> new_table_owner,
+                                     int64_t notification_log_event_id) {
   AlterTableRequestPB req;
   AlterTableResponsePB resp;
   req.mutable_table()->set_table_id(table_id);
   req.mutable_table()->set_table_name(table_name);
-  req.set_new_table_name(new_table_name);
+  if(new_table_name.is_initialized()) {
+    req.set_new_table_name(new_table_name.get());
+  }
+  if(new_table_owner.is_initialized()) {
+    req.set_new_table_owner(new_table_owner.get());
+  }
 
   // Use empty user to skip the authorization validation since the operation
   // originates from catalog manager. Moreover, this avoids duplicate effort,
@@ -2534,7 +2549,11 @@ Status CatalogManager::AlterTable(const AlterTableRequestPB& req,
     }
   });
 
-  // 5. Alter table partitioning.
+  // 5 Alter the table owner.
+  // TODO: Only the owner (or superuser) can alter the owner?
+  l.mutable_data()->pb.set_owner(req.new_table_owner());
+
+  // 6. Alter table partitioning.
   vector<scoped_refptr<TabletInfo>> tablets_to_add;
   vector<scoped_refptr<TabletInfo>> tablets_to_drop;
   if (!alter_partitioning_steps.empty()) {
@@ -2563,7 +2582,7 @@ Status CatalogManager::AlterTable(const AlterTableRequestPB& req,
     return Status::OK();
   }
 
-  // 6. Serialize the schema and increment the version number.
+  // 7. Serialize the schema and increment the version number.
   if (has_metadata_changes_for_existing_tablets && !l.data().pb.has_fully_applied_schema()) {
     l.mutable_data()->pb.mutable_fully_applied_schema()->CopyFrom(l.data().pb.schema());
   }
@@ -2584,7 +2603,7 @@ Status CatalogManager::AlterTable(const AlterTableRequestPB& req,
                                            LocalTimeAsString()));
   }
 
-  // 7. Update sys-catalog with the new table schema and tablets to add/drop.
+  // 8. Update sys-catalog with the new table schema and tablets to add/drop.
   TRACE("Updating metadata on disk");
   string deletion_msg = "Partition dropped at " + LocalTimeAsString();
   SysCatalogTable::Actions actions;
@@ -2614,7 +2633,7 @@ Status CatalogManager::AlterTable(const AlterTableRequestPB& req,
     return s;
   }
 
-  // 8. Commit the in-memory state.
+  // 9. Commit the in-memory state.
   {
     TRACE("Committing alterations to in-memory state");
 
@@ -2672,6 +2691,7 @@ Status CatalogManager::AlterTable(const AlterTableRequestPB& req,
   // This is done on a best-effort basis, since Kudu is the source of truth for
   // table schema information, and the table has already been altered in the
   // Kudu catalog via the successful sys-table write above.
+  // TODO: Perhaps owner could be best-effort instead of with the table name change.
   if (hms_catalog_ && has_schema_changes) {
     // Sanity check: if there are schema changes then this is necessarily not a
     // table rename, since we split out the rename portion into its own
@@ -2768,7 +2788,7 @@ Status CatalogManager::GetTableSchema(const GetTableSchemaRequestPB* req,
   resp->set_table_id(table->id());
   resp->mutable_partition_schema()->CopyFrom(l.data().pb.partition_schema());
   resp->set_table_name(l.data().pb.name());
-
+  resp->set_owner(l.data().pb.owner());
   return Status::OK();
 }
 

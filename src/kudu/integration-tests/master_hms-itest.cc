@@ -41,7 +41,9 @@
 #include "kudu/util/test_macros.h"
 #include "kudu/util/test_util.h"
 
+using boost::make_optional;
 using boost::none;
+using boost::optional;
 using kudu::client::KuduTable;
 using kudu::client::KuduTableAlterer;
 using kudu::client::sp::shared_ptr;
@@ -225,6 +227,27 @@ TEST_F(MasterHmsTest, TestRenameTable) {
   NO_FATALS(CheckTable("db2", "t2", /*user=*/ none));
   NO_FATALS(CheckTableDoesNotExist("db1", "t1"));
   NO_FATALS(CheckTableDoesNotExist("db1", "t2"));
+}
+
+TEST_F(MasterHmsTest, TestAlterTableOwner) {
+  // Create the Kudu table.
+  ASSERT_OK(CreateKuduTable("default", "userTable"));
+  NO_FATALS(CheckTable("default", "userTable", /*user=*/ none));
+
+  // Change the owner through the HMS, and ensure the owner is handled in Kudu.
+  const char* const userA = "userA";
+  ASSERT_OK(ChangeHmsOwner("default", "userTable", userA));
+  ASSERT_EVENTUALLY([&] {
+    NO_FATALS(CheckTable("default", "userTable", make_optional<const string&>(userA)));
+  });
+
+  // Change the owner through Kudu, and ensure the owner is reflected in HMS.
+  const char* const userB = "userB";
+  unique_ptr<KuduTableAlterer> table_alterer(client_->NewTableAlterer("default.userTable"));
+  ASSERT_OK(table_alterer->SetOwner(userB)->Alter());
+  ASSERT_EVENTUALLY([&] {
+    NO_FATALS(CheckTable("default", "userTable", make_optional<const string&>(userB)));
+  });
 }
 
 TEST_F(MasterHmsTest, TestAlterTable) {

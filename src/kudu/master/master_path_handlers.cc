@@ -328,7 +328,7 @@ void MasterPathHandlers::HandleTablePage(const Webserver::WebRequest& req,
       (*output)["error"] = Substitute("Unable to decode schema: $0", s.ToString());
       return;
     }
-    (*output)["column_count"] = schema.num_columns();
+    (*output)["column_count"] = static_cast<int64_t>(schema.num_columns());
     s = PartitionSchema::FromPB(l.data().pb.partition_schema(), schema, &partition_schema);
     if (!s.ok()) {
       (*output)["error"] =

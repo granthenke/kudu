@@ -117,6 +117,15 @@ Status HmsITestBase::RenameHmsTable(const string& database_name,
   return hms_client_->AlterTable(database_name, old_table_name, table);
 }
 
+Status HmsITestBase::ChangeHmsOwner(const string& database_name,
+                                    const string& table_name,
+                                    const string& new_table_owner) {
+  hive::Table table;
+  RETURN_NOT_OK(hms_client_->GetTable(database_name, table_name, &table));
+  table.owner = new_table_owner;
+  return hms_client_->AlterTable(database_name, table_name, table);
+}
+
 Status HmsITestBase::AlterHmsTableDropColumns(const string& database_name,
                                               const string& table_name) {
     hive::Table table;

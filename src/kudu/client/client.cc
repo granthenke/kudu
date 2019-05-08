@@ -1109,6 +1109,11 @@ KuduTableAlterer* KuduTableAlterer::RenameTo(const string& new_name) {
   return this;
 }
 
+KuduTableAlterer* KuduTableAlterer::SetOwner(const string& new_owner) {
+  data_->owner_ = new_owner;
+  return this;
+}
+
 KuduColumnSpec* KuduTableAlterer::AddColumn(const string& name) {
   Data::Step s = { AlterTableRequestPB::ADD_COLUMN,
                    new KuduColumnSpec(name), nullptr, nullptr };

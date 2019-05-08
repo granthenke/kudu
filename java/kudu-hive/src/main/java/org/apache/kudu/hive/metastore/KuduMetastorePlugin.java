@@ -156,6 +156,8 @@ public class KuduMetastorePlugin extends MetaStoreEventListener {
         !oldTable.getSd().getCols().equals(newTable.getSd().getCols())) {
       throw new MetaException("Kudu table columns may not be altered through Hive");
     }
+
+    // TODO: Can partitions be altered through hive?
   }
 
   /**

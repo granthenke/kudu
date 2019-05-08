@@ -1123,6 +1123,13 @@ class KUDU_EXPORT KuduTableAlterer {
   /// @return Raw pointer to this alterer object.
   KuduTableAlterer* RenameTo(const std::string& new_name);
 
+  /// Set the owner of the table.
+  ///
+  /// @param [in] new_owner
+  ///   The new owner for the table.
+  /// @return Raw pointer to this alterer object.
+  KuduTableAlterer* SetOwner(const std::string& new_owner);
+
   /// Add a new column to the table.
   ///
   /// When adding a column, you must specify the default value of the new

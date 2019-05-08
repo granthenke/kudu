@@ -566,11 +566,12 @@ class CatalogManager : public tserver::TabletReplicaLookupIf {
                        AlterTableResponsePB* resp,
                        rpc::RpcContext* rpc);
 
-  // Rename the specified table in response to an 'ALTER TABLE RENAME' HMS
+  // Alter the specified table in response to an 'ALTER TABLE' HMS
   // notification log listener event.
-  Status RenameTableHms(const std::string& table_id,
+  Status AlterTableHms(const std::string& table_id,
                         const std::string& table_name,
-                        const std::string& new_table_name,
+                        boost::optional<const std::string&> new_table_name,
+                        boost::optional<const std::string&> new_table_owner,
                         int64_t notification_log_event_id) WARN_UNUSED_RESULT;
 
   // Get the information about an in-progress alter operation. If 'user' is

@@ -84,7 +84,7 @@ object TableMetadata {
         (id, metadata)
     }
 
-    TableMetadataPB
+    val builder = TableMetadataPB
       .newBuilder()
       .setVersion(MetadataVersion)
       .setFromMs(options.fromMs)
@@ -97,7 +97,8 @@ object TableMetadata {
       .setNumReplicas(table.getNumReplicas)
       .setPartitions(getPartitionSchemaMetadata(table))
       .putAllTablets(tablets.asJava)
-      .build()
+      .setTableOwner(table.getOwner)
+    builder.build()
   }
 
   private def getTypeAttributesMetadata(col: ColumnSchema): ColumnTypeAttributesMetadataPB = {
@@ -307,6 +308,7 @@ object TableMetadata {
   def getCreateTableOptionsWithoutRangePartitions(metadata: TableMetadataPB): CreateTableOptions = {
     val schema = getKuduSchema(metadata)
     val options = new CreateTableOptions()
+    options.setOwner(metadata.getTableOwner)
     options.setNumReplicas(metadata.getNumReplicas)
     metadata.getPartitions.getHashPartitionsList.asScala.foreach { hp =>
       options

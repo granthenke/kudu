@@ -49,6 +49,11 @@ class HmsITestBase : public ExternalMiniClusterITestBase {
   Status AlterHmsTableDropColumns(const std::string& database_name,
                                   const std::string& table_name) WARN_UNUSED_RESULT;
 
+  // Changes the table own in the HMS catalog.
+  Status ChangeHmsOwner(const std::string& database_name,
+                        const std::string& table_name,
+                        const std::string& new_table_owner) WARN_UNUSED_RESULT;
+
   // Checks that the Kudu table schema and the HMS table entry in their
   // respective catalogs are synchronized for a particular table. It also
   // verifies that the table owner is the given user (if not provided,

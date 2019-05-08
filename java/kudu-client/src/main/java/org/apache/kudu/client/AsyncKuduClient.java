@@ -367,7 +367,7 @@ public class AsyncKuduClient implements AutoCloseable {
     this.channelFactory = b.createChannelFactory();
     this.masterAddresses = b.masterAddresses;
     this.masterTable = new KuduTable(this, MASTER_TABLE_NAME_PLACEHOLDER,
-        MASTER_TABLE_NAME_PLACEHOLDER, null, null, 1);
+        MASTER_TABLE_NAME_PLACEHOLDER, null, null, 1, null);
     this.defaultOperationTimeoutMs = b.defaultOperationTimeoutMs;
     this.defaultAdminOperationTimeoutMs = b.defaultAdminOperationTimeoutMs;
     this.statisticsDisabled = b.statisticsDisabled;
@@ -794,7 +794,8 @@ public class AsyncKuduClient implements AutoCloseable {
             resp.getTableId(),
             resp.getSchema(),
             resp.getPartitionSchema(),
-            resp.getNumReplicas());
+            resp.getNumReplicas(),
+            resp.getOwner());
       }
     });
   }
@@ -2252,7 +2253,7 @@ public class AsyncKuduClient implements AutoCloseable {
    * @param table the table
    * @param partitionKey the partition key of the tablet to look up in the table
    * @param lookupType the type of lookup to use
-   * @param deadline deadline in milliseconds for this lookup to finish
+   * @param timeout timeout in milliseconds for this lookup to finish
    * @return a deferred containing the located tablet
    */
   Deferred<LocatedTablet> getTabletLocation(final KuduTable table,

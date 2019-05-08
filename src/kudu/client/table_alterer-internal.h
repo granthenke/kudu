@@ -70,6 +70,7 @@ class KuduTableAlterer::Data {
   bool wait_;
 
   boost::optional<std::string> rename_to_;
+  boost::optional<std::string> owner_;
 
   // Set to true if there are alter partition steps.
   bool has_alter_partitioning_steps = false;

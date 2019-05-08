@@ -189,6 +189,9 @@ message SysTablesEntryPB {
   optional int64 create_timestamp = 10;
   // The last alter time of the table, in seconds since the epoch.
   optional int64 alter_timestamp = 11;
+
+  // The user that owns the table.
+  optional string owner = 12;
 }
 
 // The on-disk entry in the sys.catalog table ("metadata" column) to represent
@@ -449,8 +452,8 @@ message CreateTableRequestPB {
   optional PartitionSchemaPB partition_schema = 7;
   optional int32 num_replicas = 4;
 
-  // If set, uses the provided value as the table owner when creating the table
-  // in external catalogs such as the Hive Metastore.
+  // If set, uses the provided value as the table owner when creating the table.
+  // Otherwise, the owner is defaulted to the user that created the table.
   optional string owner = 8;
 }
 
@@ -611,6 +614,8 @@ message AlterTableRequestPB {
   // Whether to apply the alteration to external catalogs, such as the Hive Metastore,
   // which the Kudu master has been configured to integrate with.
   optional bool modify_external_catalogs = 5 [default = true];
+
+  optional string new_table_owner = 6;
 }
 
 message AlterTableResponsePB {
@@ -671,6 +676,9 @@ message GetTableSchemaResponsePB {
   // A token can always be expected with this response, unless the response is
   // from an older version of Kudu or unless the request resulted in an error.
   optional security.SignedTokenPB authz_token = 8;
+
+  // The user that owns the table.
+  optional string owner = 9;
 }
 
 message ConnectToMasterRequestPB {
