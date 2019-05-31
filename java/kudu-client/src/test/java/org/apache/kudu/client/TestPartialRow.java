@@ -17,6 +17,7 @@
 
 package org.apache.kudu.client;
 
+import static org.apache.kudu.test.ClientTestUtil.getPartialRowWithAllTypes;
 import static org.apache.kudu.test.ClientTestUtil.getSchemaWithAllTypes;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -398,29 +399,6 @@ public class TestPartialRow {
 
   private int getColumnIndex(PartialRow partialRow, String columnName) {
     return partialRow.getSchema().getColumnIndex(columnName);
-  }
-
-  private PartialRow getPartialRowWithAllTypes() {
-    Schema schema = getSchemaWithAllTypes();
-    // Ensure we aren't missing any types
-    assertEquals(13, schema.getColumnCount());
-
-    PartialRow row = schema.newPartialRow();
-    row.addByte("int8", (byte) 42);
-    row.addShort("int16", (short) 43);
-    row.addInt("int32", 44);
-    row.addLong("int64", 45);
-    row.addTimestamp("timestamp", new Timestamp(1234567890));
-    row.addBoolean("bool", true);
-    row.addFloat("float", 52.35F);
-    row.addDouble("double", 53.35);
-    row.addString("string", "fun with ütf\0");
-    row.addBinary("binary-array", new byte[] { 0, 1, 2, 3, 4 });
-    ByteBuffer binaryBuffer = ByteBuffer.wrap(new byte[] { 5, 6, 7, 8, 9 });
-    row.addBinary("binary-bytebuffer", binaryBuffer);
-    row.setNull("null");
-    row.addDecimal("decimal", BigDecimal.valueOf(12345, 3));
-    return row;
   }
 
   // Shift the type one position to force the wrong type for all types.

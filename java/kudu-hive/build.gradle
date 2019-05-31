@@ -15,10 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
+apply from: "$rootDir/gradle/shadow.gradle"
+
 dependencies {
-  // NOTE: The build currently expects all dependencies will be available
-  // via the hive-metastore classpath. Therefore, all dependencies should
-  // be provided scope.
+  compile project(path: ":kudu-client", configuration: "shadow")
+
+  // NOTE: The build currently expects all metastore plugin dependencies
+  // will be available via the hive-metastore classpath.
+  // Therefore, all dependencies should be provided scope.
+  provided libs.hiveExec
   provided libs.hiveMetastore
   provided libs.slf4jApi
   // Transitively required through hive-metastore,
@@ -27,6 +32,10 @@ dependencies {
   provided libs.hadoopMRClientCommon
 
   testCompile project(path: ":kudu-test-utils", configuration: "shadow")
+  testCompile (libs.hiveRunner) {
+    // JMS causes dependency resolution issues in Gradle.
+    exclude group: "javax.jms", module: "jms"
+  }
   testCompile libs.hiveMetastoreTest
   testCompile libs.junit
   testCompile libs.log4j
