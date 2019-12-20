@@ -180,12 +180,18 @@ def main():
     relative_build_dir = os.path.dirname(os.path.dirname(args[0]))
     test_logdir = os.path.abspath(os.path.join(os.getcwd(), relative_build_dir, "test-logs"))
   elif options.test_language == 'java':
-    test_logdir = os.path.abspath(os.path.join(ROOT, "build/java/test-logs"))
+    # This location is similar to the location in local builds except that it uses
+    # dist instead of each module folder. This means the same glob can find local test
+    # results and dist test results.
+    test_logdir = os.path.abspath(os.path.join(ROOT, "java/dist/build/test-results/test"))
+    env['TEST_LOGDIR'] = test_logdir
+
     if not os.path.exists(test_logdir):
       os.makedirs(test_logdir)
     if not os.path.exists(test_tmpdir):
       os.makedirs(test_tmpdir)
     cmd = [find_java()] + args
+    # TODO: Is this still needed with JUnit xml output?
     stdout = stderr = file(os.path.join(test_logdir, "test-output.txt"), "w")
   else:
     raise ValueError("invalid test language: " + options.test_language)

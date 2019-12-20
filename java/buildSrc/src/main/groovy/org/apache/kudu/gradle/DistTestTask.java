@@ -237,7 +237,7 @@ public class DistTestTask extends DefaultTask {
       cmd.add("-D" + e.getKey() + "=" + e.getValue());
     }
     cmd.add("-DkuduBinDir=" + isolateFileDir.relativize(binDir),
-            "org.junit.runner.JUnitCore",
+            "org.apache.kudu.test.JunitXMLCore",
             testClass);
 
     // Output the actual JSON.

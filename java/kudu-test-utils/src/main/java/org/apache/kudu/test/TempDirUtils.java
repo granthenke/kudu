@@ -72,6 +72,7 @@ public class TempDirUtils {
       newDir = Files.createTempDirectory(Paths.get(testTmpdir), prefix).toFile();
     } else {
       newDir = Files.createTempDirectory(prefix).toFile();
+      LOG.info("Using temp directory: " + newDir);
     }
     if (deleteRecursivelyOnExit == DeleteOnExit.DELETE_RECURSIVELY_ON_EXIT) {
       registerToRecursivelyDeleteOnShutdown(newDir.toPath());
