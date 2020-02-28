@@ -266,6 +266,11 @@ class MetricsLogParser(object):
       else:
         f = open(path)
       for line_number, line in enumerate(f, start=1):
+        # Ensure the line is a string-like object.
+        try:
+          line = line.decode()
+        except (UnicodeDecodeError, AttributeError):
+          pass
         # Only parse out the "metrics" lines.
         try:
           (_, _, log_type, ts, metrics_json) = line.split(" ")

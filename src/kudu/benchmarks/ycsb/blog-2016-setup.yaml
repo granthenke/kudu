@@ -1,0 +1,170 @@
+# The total set of data directories that are used by the experiment.
+#
+# NOTE: these directories will be fully deleted before each test run!
+all_data_dirs:
+  - "/data/1/kudu/master"
+  - "/data/1/kudu/ts"
+  - "/data/2/kudu/ts"
+  - "/data/3/kudu/ts"
+  - "/data/4/kudu/ts"
+  - "/data/5/kudu/ts"
+  - "/data/6/kudu/ts"
+  - "/data/7/kudu/ts"
+  - "/data/8/kudu/ts"
+  - "/data/9/kudu/ts"
+  - "/data/10/kudu/ts"
+  - "/data/11/kudu/ts"
+
+# The base flags that individual experiments can override or extend.
+base_flags:
+  # Path to find kudu-tserver and kudu-master.
+  kudu_sbin_dir: "../../../../build/latest/bin"
+
+  # Path to find the 'ycsb' binary.
+  # This assumes YCSB is checked out next to the Kudu repo and
+  # you are running from the `src/kudu/benchmarks/ycsb` directory.
+  ycsb_bin: "../../../../../YCSB/bin/ycsb.sh"
+
+  # Base options for YCSB.
+  ycsb_opts:
+    # The number of client threads to run.
+    threads: 16
+
+    # The name to use for the Kudu table.
+    table: "experiment"
+
+    # The replication factor to use for the Kudu tablets.
+    replication_factor: 1
+
+    # The number of tablets to use for the Kudu table.
+    num_tablets: 4
+
+    # The name of the YCSB workload class to use.
+    workload: "site.ycsb.workloads.CoreWorkload"
+
+    # The order to insert records. (ordered or hashed)
+    insertorder: "ordered"
+
+    # The number of records to load during the 'load' phase.
+    recordcount: 100000000
+
+    # The number of fields written to YCSB per record.
+    fieldcount: 10
+
+    # The length of each of the fields written to YCSB.
+    fieldlength: 100
+
+    # The prefix for each field/column name.
+    fieldnameprefix: "field"
+
+    # The operation count and amount of time (in seconds)
+    # that 'run' phases are permitted to run for.
+    # The operation count default is set high so that the max-time
+    # setting should take precedence.
+    operationcount: 1000000000
+    max_execution_time: 1800
+
+    # Should reads read all fields (true) or just one (false).
+    readallfields: "true"
+
+    # Should reads write all fields (true) or just one (false).
+    writeallfields: "false"
+
+    # What proportion of operations should be reads.
+    readproportion: 0.95
+
+    # What proportion of operations should be updates.
+    updateproportion: 0.05
+
+    # What proportion of operations should be inserts.
+    insertproportion: 0.00
+
+    # What proportion of operations should be scans.
+    scanproportion: 0.00
+
+    # What distribution should be used to select the records to operate on.
+    # (uniform, zipfian, hotspot, sequential, exponential or latest)
+    requestdistribution: "uniform"
+
+  # Base options for the tablet server.
+  ts_flags:
+    fs_wal_dir: "/data/1/kudu/ts"
+    fs_data_dirs:
+      - "/data/2/kudu/ts"
+      - "/data/3/kudu/ts"
+      - "/data/4/kudu/ts"
+      - "/data/5/kudu/ts"
+      - "/data/6/kudu/ts"
+      - "/data/7/kudu/ts"
+      - "/data/8/kudu/ts"
+      - "/data/9/kudu/ts"
+      - "/data/10/kudu/ts"
+      - "/data/11/kudu/ts"
+    metrics_log_interval_ms: "10000"
+
+  # Base options for the master.
+  master_flags:
+    fs_wal_dir: "/data/1/kudu/master"
+    fs_data_dirs:
+      - "/data/1/kudu/master"
+    default_num_replicas: 1
+    unlock_experimental_flags: true
+    unlock_unsafe_flags: true
+    max_num_columns: 1000
+
+# The dimensions to test along. Every combination of dimensions will be
+# tested.
+# NOTE: the cfile_do_on_finish dimension is not longer included because
+#       the flag was removed in commit 59ca360
+dimensions:
+  # Test both synchronous and buffered LOAD phase.
+  sync:
+    "true": { ycsb_opts: { load_sync: true } }
+    "false": { ycsb_opts: { load_sync: false } }
+  # Test with the WAL collocated with a data directory vs separate.
+  wal:
+    shared:
+      ts_flags:
+        fs_data_dirs:
+          - "/data/1/kudu/ts"
+          - "/data/2/kudu/ts"
+          - "/data/3/kudu/ts"
+          - "/data/4/kudu/ts"
+          - "/data/5/kudu/ts"
+          - "/data/6/kudu/ts"
+          - "/data/7/kudu/ts"
+          - "/data/8/kudu/ts"
+          - "/data/9/kudu/ts"
+          - "/data/10/kudu/ts"
+          - "/data/11/kudu/ts"
+    separate:
+      ts_flags:
+        fs_data_dirs:
+          - "/data/2/kudu/ts"
+          - "/data/3/kudu/ts"
+          - "/data/4/kudu/ts"
+          - "/data/5/kudu/ts"
+          - "/data/6/kudu/ts"
+          - "/data/7/kudu/ts"
+          - "/data/8/kudu/ts"
+          - "/data/9/kudu/ts"
+          - "/data/10/kudu/ts"
+          - "/data/11/kudu/ts"
+  # Test with different values for the number of maintenance managers
+  mm_threads:
+    1: { ts_flags: { maintenance_manager_num_threads: "1" } }
+    2: { ts_flags: { maintenance_manager_num_threads: "2" } }
+    4: { ts_flags: { maintenance_manager_num_threads: "4" } }
+  workload:
+    # A read only workload that matches YCSB workloadc
+    readonly: { ycsb_opts: {
+      readproportion: 1.00, scanproportion: 0.00,
+      updateproportion: 0.00, insertproportion: 0.00,
+      requestdistribution: "zipfian" } }
+    # An update heavy workload that matches YCSB workloada
+    writeonly: { ycsb_opts: {
+      readproportion: 0.00, scanproportion: 0.00,
+      updateproportion: 0.25, insertproportion: 0.75,
+      requestdistribution: "zipfian" } }
+
+
