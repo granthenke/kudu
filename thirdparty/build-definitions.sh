@@ -194,7 +194,6 @@ build_llvm() {
   TOOLS_ARGS="$TOOLS_ARGS -DLLVM_TOOL_LIBCXX_BUILD=OFF"
   TOOLS_ARGS="$TOOLS_ARGS -DLLVM_TOOL_LIBCXXABI_BUILD=OFF"
 
-
   # Disable some builds we don't care about.
   for arg in \
       CLANG_ENABLE_ARCMT \
