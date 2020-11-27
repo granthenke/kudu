@@ -1105,19 +1105,20 @@ endif()
 ## Google PerfTools
 ##
 ## Disabled with TSAN/ASAN.
-if (NOT "${KUDU_USE_ASAN}" AND
-    NOT "${KUDU_USE_TSAN}")
-  find_package(GPerf REQUIRED)
-  ADD_THIRDPARTY_LIB(tcmalloc
-    STATIC_LIB "${TCMALLOC_STATIC_LIB}"
-    SHARED_LIB "${TCMALLOC_SHARED_LIB}")
-  ADD_THIRDPARTY_LIB(profiler
-    STATIC_LIB "${PROFILER_STATIC_LIB}"
-    SHARED_LIB "${PROFILER_SHARED_LIB}")
-  list(APPEND KUDU_BASE_LIBS tcmalloc profiler)
-  add_definitions("-DTCMALLOC_ENABLED")
-  set(KUDU_TCMALLOC_AVAILABLE 1)
-endif()
+# TODO: Figure out why tcmalloc hangs protoc on OSX aarch64
+#if (NOT "${KUDU_USE_ASAN}" AND
+#    NOT "${KUDU_USE_TSAN}")
+#  find_package(GPerf REQUIRED)
+#  ADD_THIRDPARTY_LIB(tcmalloc
+#    STATIC_LIB "${TCMALLOC_STATIC_LIB}"
+#    SHARED_LIB "${TCMALLOC_SHARED_LIB}")
+#  ADD_THIRDPARTY_LIB(profiler
+#    STATIC_LIB "${PROFILER_STATIC_LIB}"
+#    SHARED_LIB "${PROFILER_SHARED_LIB}")
+#  list(APPEND KUDU_BASE_LIBS tcmalloc profiler)
+#  add_definitions("-DTCMALLOC_ENABLED")
+#  set(KUDU_TCMALLOC_AVAILABLE 1)
+#endif()
 
 ## curl
 find_package(CURL REQUIRED)
